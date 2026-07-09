@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>智能穿戴需求分析</title>
+<script>document.documentElement.classList.add('js');</script>
+<script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+<style>
+  :root{
+    --bg:#ffffff; --bg2:#f5f8fc; --ink:#1d1d1f; --sub:#6e6e73; --sub2:#86868b;
+    --line:#e3e5e8; --line2:#eef1f4; --blue:#0071e3; --blue2:#2997ff; --bluebg:#e8f1fd;
+    --green:#059669; --greenbg:#ecfdf5; --red:#e02424; --redbg:#fef2f2;
+    --amber:#d97706; --amberbg:#fffbeb; --graybg:#f5f5f7;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.04),0 4px 14px rgba(0,0,0,.04);
+    --shadow-md:0 2px 6px rgba(0,0,0,.05),0 12px 32px rgba(0,0,0,.06);
+    --radius:16px;
+  }
+  *{margin:0;padding:0;box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Display","SF Pro Text","Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif;
+    background:var(--bg);color:var(--ink);line-height:1.7;font-size:16.5px;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;letter-spacing:-.01em}
+  .wrap{max-width:940px;margin:0 auto;padding:0 24px 96px}
+  .js .reveal{opacity:0;transform:translateY(18px);transition:opacity .7s cubic-bezier(.22,.61,.36,1),transform .7s cubic-bezier(.22,.61,.36,1)}
+  .js .reveal.in{opacity:1;transform:none}
+  @media (prefers-reduced-motion:reduce){.js .reveal{opacity:1;transform:none;transition:none}}
+
+  /* hero */
+  .hero{padding:72px 0 52px;text-align:center;background:
+      radial-gradient(120% 80% at 50% -10%,#eaf3ff 0%,rgba(234,243,255,0) 60%),
+      radial-gradient(80% 60% at 80% 0%,#f3eaff 0%,rgba(243,234,255,0) 55%);
+    border-radius:0 0 28px 28px}
+  .hero .eyebrow{font-size:12px;color:var(--blue);font-weight:700;letter-spacing:.16em;text-transform:uppercase;margin-bottom:16px}
+  .hero h1{font-size:42px;font-weight:800;line-height:1.12;letter-spacing:-.025em;margin-bottom:18px;color:var(--ink);
+    background:linear-gradient(120deg,#1d1d1f 30%,#0071e3 100%);-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+  .hero .desc{font-size:17px;color:var(--sub);max-width:640px;margin:0 auto;line-height:1.65;font-weight:400}
+  .hero .meta{display:flex;gap:10px 22px;margin-top:30px;justify-content:center;flex-wrap:wrap;font-size:12.5px;color:var(--sub2)}
+  .hero .meta span{display:flex;align-items:center;gap:6px}
+  .hero .meta span::before{content:"";width:5px;height:5px;border-radius:50%;background:var(--blue2)}
+  .divider{height:1px;background:var(--line2);margin:0}
+
+  /* toc */
+  .toc{padding:38px 0}
+  .toc .ttl{font-size:11px;color:var(--sub2);letter-spacing:.14em;text-transform:uppercase;margin-bottom:18px;font-weight:700}
+  .toc-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line2);border:1px solid var(--line2);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow-sm)}
+  .toc-item{background:var(--bg);padding:16px 22px;display:flex;align-items:center;gap:14px;text-decoration:none;color:var(--ink);transition:background .2s,transform .2s}
+  .toc-item:hover{background:var(--bg2)}
+  .toc-item.active{background:var(--bluebg)}
+  .toc-item.active .t{color:var(--blue)}
+  .toc-item .n{font-size:12px;color:var(--blue);font-weight:800;width:24px;flex-shrink:0}
+  .toc-item .t{font-size:13.5px;font-weight:500;letter-spacing:-.01em}
+
+  /* section */
+  section{padding:56px 0;scroll-margin-top:18px}
+  .s-head{text-align:center;margin-bottom:38px}
+  .s-head .sn{display:inline-block;font-size:11px;color:#fff;background:linear-gradient(120deg,var(--blue),var(--blue2));font-weight:700;letter-spacing:.1em;padding:3px 12px;border-radius:980px;margin-bottom:12px}
+  .s-head h2{font-size:31px;font-weight:800;letter-spacing:-.025em;line-height:1.18;margin-bottom:10px}
+  .s-head .ss{font-size:15px;color:var(--sub);max-width:580px;margin:0 auto;font-weight:400}
+  h3{font-size:21px;font-weight:700;letter-spacing:-.01em;margin:38px 0 16px;color:var(--ink);display:flex;align-items:center;gap:10px}
+  h3::before{content:"";width:4px;height:20px;border-radius:4px;background:linear-gradient(var(--blue),var(--blue2));display:inline-block}
+  h4{font-size:16.5px;font-weight:700;margin:24px 0 10px;color:var(--ink)}
+  p{margin-bottom:14px;color:#2b2b2e;font-size:15.5px}
+  .lead{font-size:17px;color:var(--sub);line-height:1.7;padding:24px 26px;border:1px solid var(--line2);border-left:3px solid var(--blue);background:linear-gradient(90deg,var(--bg2),#fff);border-radius:14px;margin:24px 0}
+  .lead b{color:var(--ink)}
+
+  /* stat */
+  .stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:30px 0}
+  .stat{background:var(--bg);border:1px solid var(--line2);border-radius:var(--radius);padding:24px 18px;text-align:center;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s}
+  .stat:hover{transform:translateY(-3px);box-shadow:var(--shadow-md)}
+  .stat .v{font-size:32px;font-weight:800;color:var(--ink);line-height:1;letter-spacing:-.03em}
+  .stat .v .u{font-size:14px;font-weight:600;color:var(--sub);margin-left:3px}
+  .stat .l{font-size:11.5px;color:var(--sub);margin-top:10px;line-height:1.5}
+
+  /* table */
+  .tbl-wrap{margin:24px 0;border-radius:14px;overflow:hidden;border:1px solid var(--line2);box-shadow:var(--shadow-sm)}
+  table{width:100%;border-collapse:collapse;font-size:13px}
+  th{background:var(--bg2);padding:13px 15px;text-align:left;font-weight:700;color:var(--ink);font-size:12px;border-bottom:1px solid var(--line2);letter-spacing:.01em}
+  td{padding:13px 15px;border-bottom:1px solid var(--line2);vertical-align:top;color:#2b2b2e;line-height:1.6}
+  tr:last-child td{border-bottom:none}
+  tr:hover td{background:#fafcff}
+  td.k{color:var(--blue);font-weight:700}
+  td.g{color:var(--green);font-weight:700}
+  td.a{color:var(--amber);font-weight:700}
+  td.r{color:var(--red);font-weight:700}
+
+  /* chart */
+  .chart-card{background:linear-gradient(180deg,#fafcff,#f5f8fc);border:1px solid var(--line2);border-radius:var(--radius);padding:22px 22px 14px;margin:26px 0;box-shadow:var(--shadow-sm)}
+  .chart-card .ct{font-size:12.5px;font-weight:700;color:var(--sub);margin-bottom:14px;letter-spacing:.01em;display:flex;align-items:center;gap:7px}
+  .chart-card .ct::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue)}
+  .chart{width:100%;height:330px}
+  .chart.h420{height:390px}
+
+  /* callout */
+  .note{border-radius:14px;padding:16px 20px;margin:20px 0;font-size:14px;line-height:1.65;box-shadow:var(--shadow-sm)}
+  .note.pos{background:var(--greenbg);border:1px solid #bbf7d0}
+  .note.neg{background:var(--redbg);border:1px solid #fecaca}
+  .note.warn{background:var(--amberbg);border:1px solid #fde68a}
+  .note.info{background:var(--bluebg);border:1px solid #bfdbfe}
+  .note b{display:block;margin-bottom:6px;font-size:12px;font-weight:800;letter-spacing:.02em}
+  .note.pos b{color:var(--green)} .note.neg b{color:var(--red)}
+  .note.warn b{color:var(--amber)} .note.info b{color:var(--blue)}
+  .note ul{margin:4px 0 0;padding-left:18px} .note li{margin:3px 0}
+  .note .npain{margin-top:8px;display:flex;flex-direction:column;gap:8px}
+  .note .npain>div{display:flex;gap:7px;line-height:1.68;font-size:14.5px}
+  .note .npain .nidx{color:var(--amber);font-weight:800;flex:0 0 auto}
+  .note .npain b{display:inline;font-size:inherit;font-weight:700;color:var(--ink);margin:0}
+
+  /* seg card */
+  .seg{background:var(--bg);border:1px solid var(--line2);border-radius:var(--radius);padding:20px 22px;margin:16px 0;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s}
+  .seg:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+  .seg .sh{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:8px;padding-bottom:12px;border-bottom:1px solid var(--line2)}
+  .seg .st{font-size:16px;font-weight:700;color:var(--ink);letter-spacing:-.01em}
+  .row{display:grid;grid-template-columns:104px 1fr;gap:14px;padding:9px 0;border-bottom:1px solid var(--line2);font-size:13.5px}
+  .row:last-child{border-bottom:none}
+  .row .pt{font-weight:700;color:var(--sub);font-size:12px;padding-top:1px}
+  .row .pc{color:#2b2b2e;line-height:1.6}
+  .row .pc b{color:var(--ink)}
+  .badge{display:inline-block;font-size:10.5px;padding:3px 10px;border-radius:980px;font-weight:700;margin-left:6px;letter-spacing:.02em;white-space:nowrap}
+  .badge.hot{background:#fee2e2;color:var(--red)} .badge.warm{background:#fef3c7;color:var(--amber)}
+  .badge.cool{background:var(--bluebg);color:var(--blue)} .badge.new{background:var(--greenbg);color:var(--green)}
+  .badge.exp{background:var(--graybg);color:var(--sub)}
+
+  /* matrix */
+  .matrix{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+  .mcol{border-radius:var(--radius);padding:22px;box-shadow:var(--shadow-sm)}
+  .mcol.met{background:var(--greenbg);border:1px solid #bbf7d0}
+  .mcol.unmet{background:var(--redbg);border:1px solid #fecaca}
+  .mcol h4{margin:0 0 12px;font-size:15.5px}
+  .mcol.met h4{color:var(--green)} .mcol.unmet h4{color:var(--red)}
+  .mcol ul{list-style:none;font-size:13px}
+  .mcol li{padding:8px 0;border-bottom:1px solid rgba(0,0,0,.06)}
+  .mcol li:last-child{border-bottom:none}
+  .mcol li b{display:block;font-size:13px;margin-bottom:2px;color:var(--ink)}
+  .mcol li span{color:var(--sub);font-size:12px;line-height:1.5}
+
+  /* evolution 5-step (CSS visual) */
+  .evo{display:flex;align-items:stretch;gap:0;margin:24px 0;flex-wrap:nowrap;position:relative}
+  .evo-step{flex:1;position:relative;padding:18px 12px 16px;text-align:center;background:var(--bg);border:1px solid var(--line2);box-shadow:var(--shadow-sm)}
+  .evo-step:first-child{border-radius:14px 0 0 14px}
+  .evo-step:last-child{border-radius:0 14px 14px 0}
+  .evo-step:not(:last-child)::after{content:"";position:absolute;right:-9px;top:50%;transform:translateY(-50%);width:18px;height:18px;background:var(--bg);border-top:1px solid var(--line2);border-right:1px solid var(--line2);transform:translateY(-50%) rotate(45deg);z-index:2}
+  .evo-step .en{font-size:11px;color:var(--sub2);font-weight:700;letter-spacing:.04em}
+  .evo-step .ec{font-size:15px;font-weight:800;color:var(--ink);margin:4px 0 6px}
+  .evo-step .ed{font-size:11px;color:var(--sub);line-height:1.45}
+  .evo-step.now{background:linear-gradient(180deg,var(--bluebg),#fff);border-color:var(--blue)}
+  .evo-step.now .ec{color:var(--blue)}
+  .evo-step.now .badge-now{display:inline-block;font-size:10px;font-weight:800;color:#fff;background:var(--blue);padding:2px 8px;border-radius:980px;margin-top:6px}
+
+  /* hypo */
+  .hypo{background:var(--bg);border:1px solid var(--line2);border-radius:var(--radius);padding:22px 24px;margin:20px 0;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s}
+  .hypo:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+  .hypo .hn{display:inline-block;background:linear-gradient(120deg,var(--blue),var(--blue2));color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:980px;margin-bottom:10px}
+  .hypo h4{color:var(--ink);margin:0 0 8px;font-size:17px;font-weight:700}
+  .hypo .form{display:grid;grid-template-columns:auto 1fr;gap:9px 14px;font-size:13.5px;margin-top:14px}
+  .hypo .form dt{font-weight:700;color:var(--sub);white-space:nowrap;font-size:12px;padding-top:1px}
+  .hypo .form dd{color:#2b2b2e;line-height:1.6}
+
+  /* verdict */
+  .verdict{display:grid;grid-template-columns:auto 1fr;gap:8px 14px;margin:16px 0;font-size:13.5px;padding:15px 18px;background:var(--bg2);border-radius:12px;border:1px solid var(--line2)}
+  .verdict dt{font-weight:700;color:var(--sub);white-space:nowrap}
+  .verdict dd{color:#2b2b2e;line-height:1.55}
+  .verdict dd b{color:var(--ink)}
+
+  /* innov grid */
+  .innov-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin:24px 0}
+  .innov{background:var(--bg);border:1px solid var(--line2);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow-sm);transition:transform .25s,box-shadow .25s}
+  .innov:hover{transform:translateY(-2px);box-shadow:var(--shadow-md)}
+  .innov .ih{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+  .innov .it{font-weight:700;font-size:14.5px;color:var(--ink)}
+  .innov .ib{font-size:11px;color:var(--sub);margin-top:3px}
+  .innov ul{list-style:none;font-size:12.5px;margin-top:8px}
+  .innov li{padding:5px 0;color:#2b2b2e;line-height:1.5;border-bottom:1px solid var(--line2)}
+  .innov li:last-child{border-bottom:none}
+  .innov li::before{content:"›";color:var(--blue);font-weight:800;margin-right:6px}
+  .innov.lesson{background:var(--redbg);border:1px solid #fecaca}
+  .innov.lesson .it{color:var(--red)}
+
+  /* value rank */
+  .vrank{margin:24px 0}
+  .vrank-item{display:grid;grid-template-columns:46px 1fr;gap:18px;padding:18px 18px;border-bottom:1px solid var(--line2);background:var(--bg);border:1px solid var(--line2);border-radius:14px;margin-bottom:12px;box-shadow:var(--shadow-sm)}
+  .vrank-item:last-child{border-bottom:1px solid var(--line2);margin-bottom:0}
+  .vrank-item .vr{font-size:28px;font-weight:800;color:var(--blue);line-height:1;letter-spacing:-.03em;text-align:center;align-self:center}
+  .vrank-item .vt{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:5px}
+  .vrank-item .vd{font-size:13.5px;color:var(--sub);line-height:1.65}
+  .vrank-item .vd b{color:var(--ink);font-weight:700}
+
+  /* bridge note */
+  .bridge{background:linear-gradient(120deg,#f5f8fc,#eef4ff);border:1px dashed var(--blue);border-radius:14px;padding:16px 20px;margin:18px 0;font-size:14px;color:var(--sub);line-height:1.65}
+  .bridge b{color:var(--blue)}
+
+  /* refs */
+  .refs{padding:52px 0 0}
+  .refs h3{font-size:18px;font-weight:700;margin-bottom:16px}
+  .refs ol{padding-left:20px}
+  .refs li{padding:8px 0;font-size:12.5px;color:var(--sub);line-height:1.6;border-bottom:1px solid var(--line2)}
+  .refs li:last-child{border-bottom:none}
+  .refs li a{color:var(--blue);text-decoration:none}
+  .refs li a:hover{text-decoration:underline}
+  .refs li a b{color:inherit;font-weight:700}
+  .refs li b{color:var(--ink);font-weight:700}
+
+  footer{padding:40px 0 0;text-align:center;border-top:1px solid var(--line2);margin-top:40px}
+  footer p{font-size:11.5px;color:var(--sub2);margin-bottom:6px}
+
+  /* back to top */
+  .totop{position:fixed;right:22px;bottom:22px;width:44px;height:44px;border-radius:50%;background:var(--blue);color:#fff;border:none;cursor:pointer;box-shadow:var(--shadow-md);
+    opacity:0;pointer-events:none;transform:translateY(10px);transition:opacity .3s,transform .3s;font-size:18px;display:flex;align-items:center;justify-content:center;z-index:50}
+  .totop.show{opacity:1;pointer-events:auto;transform:none}
+  .totop:hover{background:var(--blue2)}
+
+  @media(max-width:760px){
+    .hero{padding:48px 0 34px;border-radius:0 0 20px 20px}
+    .hero h1{font-size:30px}
+    .hero .desc{font-size:15px}
+    .toc-grid{grid-template-columns:1fr}
+    .stat-row{grid-template-columns:1fr 1fr;gap:10px}
+    .matrix,.innov-grid{grid-template-columns:1fr}
+    .row{grid-template-columns:1fr;gap:2px}
+    .row .pt{margin-bottom:2px}
+    .hypo .form{grid-template-columns:1fr;gap:2px}
+    .hypo .form dt{margin-top:8px}
+    section{padding:38px 0}
+    .s-head h2{font-size:25px}
+    h3{font-size:18px;margin:30px 0 14px}
+    .evo{flex-wrap:wrap;gap:10px}
+    .evo-step{flex:1 1 40%;border-radius:14px!important}
+    .evo-step::after{display:none}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="eyebrow">需求分析</div>
+  <h1>智能穿戴需求分析</h1>
+  <p class="desc">立足 AI 时代，从市场细分切入，按品类剖析主流与创新产品，洞察用户共性场景痛点，正反论证需求价值，构想 AI 驱动的功能性创新方向。</p>
+  <div class="meta">
+    <span>IDC / 洛图科技 / IIM / Counterpoint / Omdia</span>
+    <span>2026年7月</span>
+    <span>手表·手环·戒指·眼镜·耳机·医疗级</span>
+  </div>
+</div>
+<div class="divider"></div>
+
+<!-- TOC -->
+<div class="toc">
+  <div class="ttl">目录</div>
+  <div class="toc-grid">
+    <a class="toc-item" href="#s1"><span class="n">01</span><span class="t">执行摘要与核心判断</span></a>
+    <a class="toc-item" href="#s2"><span class="n">02</span><span class="t">智能穿戴市场细分全景</span></a>
+    <a class="toc-item" href="#s3"><span class="n">03</span><span class="t">分品类产品矩阵深度剖析</span></a>
+    <a class="toc-item" href="#s4"><span class="n">04</span><span class="t">用户场景问题与共性痛点</span></a>
+    <a class="toc-item" href="#s5"><span class="n">05</span><span class="t">现有需求与未被满足需求</span></a>
+    <a class="toc-item" href="#s6"><span class="n">06</span><span class="t">AI 时代需求价值研判与正反论证</span></a>
+    <a class="toc-item" href="#s7"><span class="n">07</span><span class="t">AI 驱动的功能性创新与场景论证</span></a>
+    <a class="toc-item" href="#s8"><span class="n">08</span><span class="t">行业创新产品参考</span></a>
+  </div>
+</div>
+<div class="divider"></div>
+
+<!-- 01 -->
+<section id="s1" class="reveal">
+  <div class="s-head"><div class="sn">01</div><h2>执行摘要与核心判断</h2><p class="ss">一分钟看懂全局</p></div>
+  <p class="lead">智能穿戴行业正经历从「参数堆砌」到「体验与价值驱动」的范式转移。<b>健康改善已取代运动监测成为用户首要动机</b>，AI 端侧大模型成熟使设备从"传感终端"迈向"智能主体"。医疗级精准监测、AI 主动服务、跨场景生态协同构成三大增长引擎；腕戴基本盘稳固，智能戒指与 AI 眼镜成为最具想象力的新增量。</p>
+  <div class="stat-row">
+    <div class="stat"><div class="v">7390<span class="u">万台</span></div><div class="l">2025年中国腕戴出货量<br>同比 +20.8%（IDC）</div></div>
+    <div class="stat"><div class="v">850<span class="u">亿元</span></div><div class="l">健康医疗监测穿戴市场<br>医疗级年增速 40%+（IIM）</div></div>
+    <div class="stat"><div class="v">870<span class="u">万台</span></div><div class="l">2025全球智能眼镜出货<br>Meta 独占 740万（Omdia）</div></div>
+    <div class="stat"><div class="v">52<span class="u">亿美元</span></div><div class="l">Oura Ring 估值<br>验证戒指赛道价值</div></div>
+  </div>
+  <h3>五项核心判断</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th style="width:7%">#</th><th style="width:30%">判断</th><th>关键依据</th></tr>
+    <tr><td class="k">J1</td><td>腕戴是基本盘，增长见顶，差异化与医疗化是出路</td><td>手环 TOP2 份额 90.7%；成人手表均价 1147 元，需向医疗级溢价突破</td></tr>
+    <tr><td class="k">J2</td><td>智能戒指是 0→1 新品类，"无感+长续航+医疗级数据"为护城河</td><td>Oura 凭 7 天续航、医疗级报告、订阅模式估值 52 亿美元</td></tr>
+    <tr><td class="k">J3</td><td>AI 眼镜处于爆发前夜，端侧大模型与翻译/提词是刚需突破口</td><td>中国 AR 眼镜出货 +147%，Meta 独大 84%，国产端侧方案崛起</td></tr>
+    <tr><td class="k">J4</td><td>用户最大未被满足需求是"数据可信→可行动建议"闭环缺失</td><td>65% 购买者首要考量医疗级精度；监测多止于展示，被视为"噱头"</td></tr>
+    <tr><td class="k">J5</td><td>AI 端侧大模型成熟使"被动记录→主动服务"成为可能，重塑价值锚点</td><td>端侧 1.2-1.8B 模型可离线运行，AI Agent 主动感知场景执行任务</td></tr>
+  </table></div>
+</section>
+
+<!-- 02 -->
+<section id="s2" class="reveal">
+  <div class="s-head"><div class="sn">02</div><h2>智能穿戴市场细分全景</h2><p class="ss">八大赛道分层透视</p></div>
+  <p>智能穿戴由<b>产品形态 × 功能定位 × 用户群体</b>三维切割出复杂版图。各赛道处于不同生命周期，增长动能与竞争逻辑迥异——<b>腕戴稳、眼镜与戒指爆发、医疗级高价值</b>，下文以成熟度-增长力矩阵与增速对比双重透视。</p>
+  <div class="chart-card"><div class="ct">图 2-1　八大细分赛道成熟度-增长力矩阵</div><div class="chart h420" id="chart-seg"></div></div>
+  <div class="chart-card"><div class="ct">图 2-2　重点赛道增长动能对比（%）</div><div class="chart" id="chart-growth"></div></div>
+  <div class="note info"><b>赛道分层结论</b>腕戴（手表+手环）贡献超 80% 出货量，是"现金牛"；智能戒指、AI 眼镜、医疗级穿戴分别处于导入期与高速成长期，是未来 3-5 年的增量主战场。</div>
+  <h3>2.1 腕戴设备：稳健基本盘</h3>
+  <p>腕戴（手表+手环）贡献超 80% 出货量。2025 年中国腕戴出货 7390 万台（IDC），智能手表 5061 万台（+17.2%）、手环 2329 万台（+29.4%）。内部分化加剧：成人手表向医疗级+全生态升级，儿童表受新国标重构，手环深耕垂直监测与下沉市场。</p>
+  <div class="tbl-wrap"><table>
+    <tr><th>细分品类</th><th>2025线上销量</th><th>同比</th><th>均价</th><th>龙头份额</th><th>核心驱动</th></tr>
+    <tr><td class="k">成人智能手表</td><td>2134.1万台</td><td class="g">+15.6%</td><td>1147元</td><td>华为24.5% / 苹果16.5%</td><td>医疗级·AI生态·国补</td></tr>
+    <tr><td>儿童智能手表</td><td>1122.4万台</td><td class="g">+7.5%</td><td>510元</td><td>小天才30.3% / 华为10.0%</td><td>新国标·AI陪伴·安全</td></tr>
+    <tr><td>智能手环</td><td>1229.8万台</td><td class="g">+14.9%</td><td>307元</td><td>小米63.7% / 华为27.0%</td><td>轻量化·性价比·下沉</td></tr>
+  </table></div>
+  <h3>2.2 智能戒指：0→1 新品类 <span class="badge new">新兴</span></h3>
+  <p>以"无感佩戴+超长续航+医疗级数据"重新定义夜间与全天候监测。Oura 估值 52 亿美元，三星 Galaxy Ring、华为戒指相继入局，RingConn 以 10-12 天续航+无订阅切入。</p>
+  <h3>2.3 AI 智能眼镜：爆发前夜 <span class="badge hot">高增长</span></h3>
+  <p>2025 全球出货 870 万台，Meta Ray-Ban 独占 740 万台（+281%）。中国 AR 眼镜出货 +147%，端侧大模型+同声翻译+提词的轻量化设备成首选，"端侧全离线+六语种同传+动态提词+4K 拍摄"为专业级分水岭。</p>
+  <h3>2.4 TWS 智能耳机：存量市场的 AI 化升级</h3>
+  <p>TWS 进入存量竞争，开放式耳机（OWS）国产品牌主导，"音频+健康监测"融合成差异化方向。</p>
+  <h3>2.5 医疗级健康穿戴：增速最快蓝海 <span class="badge warm">高价值</span></h3>
+  <p>2025 预计出货 1.2 亿台、规模 850 亿元，医疗级年复合增速 40%+。超 15 款获二类医疗器械证。无创血糖（84.7%）、连续血压（±5mmHg）、睡眠呼吸暂停（FDA 认证）为三大攻坚方向。</p>
+  <h3>2.6 智能服装与其他：前瞻布局</h3>
+  <p>智能纺织品（自供电传感+温控）、贴片式监测、脑机接口仍处早期，为极端环境与专业医疗提供长期想象。</p>
+</section>
+
+<!-- 03 -->
+<section id="s3" class="reveal">
+  <div class="s-head"><div class="sn">03</div><h2>分品类产品矩阵深度剖析</h2><p class="ss">主流与创新产品并重，按品类解构</p></div>
+  <p>下文按<b>手表、手环、戒指、眼镜、耳机、医疗级</b>六大产品品类展开，每品类覆盖主流旗舰与创新突破，并从健康监测、交互、续航、生态、价格等维度横向对比。先以市场占有率趋势图建立品类演进的整体坐标。</p>
+  <div class="chart-card"><div class="ct">图 3-1　智能穿戴各品类市场占有率变化趋势（2021-2025）</div><div class="chart h420" id="chart-trend"></div></div>
+  <h3>3.1 智能手表品类：生态与医疗级双轮驱动</h3>
+  <div class="seg"><div class="sh"><span class="st">主流旗舰 · 华为 WATCH 5</span><span class="badge cool">市占第一</span></div>
+    <div class="row"><div class="pt">价格定位</div><div class="pc"><b>2699元起</b>，覆盖中高端</div></div>
+    <div class="row"><div class="pt">健康监测</div><div class="pc">X-TAP 指尖血氧（±1%）、30秒高血压风险筛查、17项微体检（HRV/卵巢功能）、ECG，与瑞金医院合作</div></div>
+    <div class="row"><div class="pt">交互体验</div><div class="pc">小艺联动盘古大模型，手势操控，星闪技术（抗干扰+300%），跨设备控车</div></div>
+    <div class="row"><div class="pt">续航</div><div class="pc">全能4.5天 / 省电11天，无线快充</div></div>
+    <div class="row"><div class="pt">市场表现</div><div class="pc">线上份额 <b>24.5%</b>，同比+46.8%，提升5.2pp</div></div>
+  </div>
+  <div class="seg"><div class="sh"><span class="st">主流旗舰 · Apple Watch Series 10</span><span class="badge warm">溢价之王</span></div>
+    <div class="row"><div class="pt">价格定位</div><div class="pc"><b>2999元起</b>，3000元+价位段占6成，销额占比40%领跑</div></div>
+    <div class="row"><div class="pt">健康监测</div><div class="pc">体温经期预测（90%+）、睡眠呼吸暂停（FDA认证）、水温深度计、车祸检测<3秒、卫星SOS</div></div>
+    <div class="row"><div class="pt">交互体验</div><div class="pc">双指互点手势，LTPO3 广视角屏，S10 SiP（4核神经网络）</div></div>
+    <div class="row"><div class="pt">续航</div><div class="pc">常规18h / 低功耗36h，15分钟快充8h</div></div>
+    <div class="row"><div class="pt">市场表现</div><div class="pc">线上份额 <b>16.5%</b>，同比+5.7pp；S11+SE3+Ultra3 完整矩阵</div></div>
+  </div>
+  <div class="seg"><div class="sh"><span class="st">主流旗舰 · 小米 Watch S4 / 三星 W8 / 佳明</span><span class="badge exp">差异化阵营</span></div>
+    <div class="row"><div class="pt">小米 S4</div><div class="pc">1299元，心率血氧98.2%，玄戒T1芯片续航15天，人车家入口，份额8.8%</div></div>
+    <div class="row"><div class="pt">三星 W8</div><div class="pc">2299元起，3nm+3000尼特+"天圆地方"，抗氧化/血管负荷监测，iOS兼容有限</div></div>
+    <div class="row"><div class="pt">佳明 Fenix</div><div class="pc">专业运动垂直深耕，运动精度与续航领先，大众化不足，小众高端</div></div>
+  </div>
+  <div class="seg"><div class="sh"><span class="st">创新突破 · 灵希连续血压手表（灵析生物）</span><span class="badge new">医疗级创新</span></div>
+    <div class="row"><div class="pt">产品亮点</div><div class="pc">医疗级无创连续血压，误差±5mmHg，填补无创血压空白；与血糖戒指构成"无创精准监测"双翼</div></div>
+  </div>
+  <div class="chart-card"><div class="ct">图 3-2　智能手表品类主流产品能力解析</div><div class="chart h420" id="chart-watch-radar"></div></div>
+  <h3>3.2 智能手环品类：极致性价比与轻量化</h3>
+  <div class="seg"><div class="sh"><span class="st">主流旗舰 · 小米手环 10 / 华为手环 10</span><span class="badge cool">双寡头</span></div>
+    <div class="row"><div class="pt">小米手环10</div><div class="pc">约200-300元，屏幕/亮度/低功耗/传感器多维升级，线上份额<b>63.7%</b>，单机型占品牌35.6%</div></div>
+    <div class="row"><div class="pt">华为手环10</div><div class="pc">线上份额<b>27.0%</b>，同比-4.1pp；3月发新节奏滞后，单机型贡献近7成</div></div>
+    <div class="row"><div class="pt">演进方向</div><div class="pc">聚焦碎片化信息处理（摘要/提醒/预警），依托高性价比夯实大众与下沉市场</div></div>
+  </div>
+  <div class="chart-card"><div class="ct">图 3-3　智能手环品类主流产品能力解析</div><div class="chart h420" id="chart-band-radar"></div></div>
+  <h3>3.3 智能戒指品类：无感监测新物种</h3>
+  <div class="chart-card"><div class="ct">图 3-4　智能戒指主要品牌战略定位对比</div><div class="chart" id="chart-ring-compare"></div></div>
+  <div class="seg"><div class="sh"><span class="st">创新定义者 · Oura Ring</span><span class="badge new">赛道开创</span></div>
+    <div class="row"><div class="pt">商业模式</div><div class="pc">硬件+$6/月订阅，估值52亿美元</div></div>
+    <div class="row"><div class="pt">核心壁垒</div><div class="pc">7-8天无感佩戴+医院标准数据格式+全球医疗系统认可；睡眠"评分化"可发现房颤</div></div>
+  </div>
+  <div class="seg"><div class="sh"><span class="st">创新跟随者 · Ultrahuman / RingConn</span><span class="badge exp">差异化</span></div>
+    <div class="row"><div class="pt">Ultrahuman</div><div class="pc">高溢价路线，18K金高奢款，订阅$17.9/月，靠自然流量增长</div></div>
+    <div class="row"><div class="pt">RingConn</div><div class="pc">华人品牌极致性价比，10-12天续航（带盒150天），无订阅，众筹起家</div></div>
+  </div>
+  <div class="seg"><div class="sh"><span class="st">创新突破 · 灵析无创血糖戒指</span><span class="badge new">技术前沿</span></div>
+    <div class="row"><div class="pt">技术突破</div><div class="pc">BGEM™（机器学习+PPG），血糖升高（≥7.8mmol/L）检测84.7%准确率，已通过新加坡KK医院临床验证</div></div>
+  </div>
+  <h3>3.4 AI 智能眼镜品类：下一代计算平台之争</h3>
+  <div class="chart-card"><div class="ct">图 3-5　2025-2026 主流 AI 智能眼镜能力对比</div><div class="chart h420" id="chart-glasses-radar"></div></div>
+  <div class="seg"><div class="sh"><span class="st">市场引爆者 · Meta Ray-Ban Gen 2</span><span class="badge hot">垄断</span></div>
+    <div class="row"><div class="pt">产品哲学</div><div class="pc">49g+大牌眼镜均价（<3000元）+蓝牙耳机+摄影+语音助手多重体验</div></div>
+    <div class="row"><div class="pt">技术升级</div><div class="pc">骁龙AR1+Llama 4，带屏版本已发布</div></div>
+    <div class="row"><div class="pt">市场表现</div><div class="pc">2025年740万台，Q1份额84%，同比+281%；短板：英语单语、续航2.1h、提词未上线</div></div>
+  </div>
+  <div class="seg"><div class="sh"><span class="st">国产端侧代表 · INMO GO3 AR</span><span class="badge new">国产突破</span></div>
+    <div class="row"><div class="pt">核心技术</div><div class="pc">自研千问-Qwen-Edge（1.2B），高通XR2+端侧运行；中英同传延迟320ms，六语种离线互译</div></div>
+    <div class="row"><div class="pt">创新功能</div><div class="pc">动态视距补偿提词（±8°自动微调，误差≤0.3秒）；4K@30fps录制；79g医用级鼻托</div></div>
+  </div>
+  <div class="seg"><div class="sh"><span class="st">国产竞品 · Rokid Max / XREAL Beam</span><span class="badge exp">第二梯队</span></div>
+    <div class="row"><div class="pt">Rokid Max</div><div class="pc">2999元，MTK 9300++Llama-3-Edge（1.8B），中英同传，日韩法需云端，提词无视线追踪</div></div>
+    <div class="row"><div class="pt">XREAL Beam</div><div class="pc">3299元，Android 14+通义千问API，推理强制云端，弱网延迟3.8秒</div></div>
+  </div>
+  <h3>3.5 TWS 智能耳机品类：AI 化与开放式新形态</h3>
+  <div class="seg"><div class="sh"><span class="st">演进方向 · 开放式耳机(OWS)与音频+健康融合</span><span class="badge warm">存量升级</span></div>
+    <div class="row"><div class="pt">品类现状</div><div class="pc">TWS存量竞争，OWS国产品牌主导</div></div>
+    <div class="row"><div class="pt">创新方向</div><div class="pc">"音频+健康监测"融合（心率/体温）；AI降噪与语音助手集成；苹果带摄像头AirPods(H90)研发中</div></div>
+  </div>
+  <div class="chart-card"><div class="ct">图 3-6　TWS 智能耳机品类演进方向解析</div><div class="chart h420" id="chart-ear-radar"></div></div>
+  <h3>3.6 医疗级健康穿戴品类：从消费级向医疗级跃迁</h3>
+  <div class="seg"><div class="sh"><span class="st">技术攻坚 · 三大无创监测圣杯</span><span class="badge warm">高价值</span></div>
+    <div class="row"><div class="pt">无创血糖</div><div class="pc">灵析BGEM™ 84.7%准确率；Afon Technology 推进临床试验</div></div>
+    <div class="row"><div class="pt">连续血压</div><div class="pc">小米S4 ±5mmHg；华为与瑞金医院合作高血压筛查</div></div>
+    <div class="row"><div class="pt">睡眠呼吸暂停</div><div class="pc">Apple Watch 通过FDA认证；华为17项微体检含HRV</div></div>
+  </div>
+  <div class="chart-card"><div class="ct">图 3-7　医疗级健康穿戴品类技术攻坚成熟度解析</div><div class="chart h420" id="chart-medical-radar"></div></div>
+</section>
+
+<!-- 04 -->
+<section id="s4" class="reveal">
+  <div class="s-head"><div class="sn">04</div><h2>用户场景问题与共性痛点</h2><p class="ss">跨人群共性问题的量化还原</p></div>
+  <p>将用户划分为五大人群，提炼每类人群普遍遭遇的<b>共性问题</b>并量化占比，避免"伪需求"陷阱。</p>
+  <h3>4.1 五大人群及其共性场景问题</h3>
+  <div class="tbl-wrap"><table>
+    <tr><th style="width:15%">人群分类</th><th style="width:22%">典型场景</th><th>普遍存在的共性问题</th><th style="width:13%">问题占比</th></tr>
+    <tr><td class="k">运动健身人群</td><td>跑步/骑行/游泳/铁三训练与赛事</td><td>GPS漂移影响配速；运动中心率延迟致区间误判；多设备数据割裂；专业精度与旗舰体验难兼得</td><td class="a">约58%</td></tr>
+    <tr><td class="k">睡眠健康关注人群</td><td>夜间监测睡眠质量，期望改善建议</td><td>手表笨重硌手影响睡眠本身；数据笼统只报时长不开方；压力/HRV监测止于数字，被当"噱头"</td><td class="r">约67%</td></tr>
+    <tr><td class="k">银发慢病人群</td><td>血压/血糖监测、跌倒防护、紧急呼救</td><td>操作复杂字小看不清；消费级数据不敢信，医疗设备笨重昂贵；数据无法连通医院；跌倒检测误报漏报</td><td class="r">约72%</td></tr>
+    <tr><td class="k">商务差旅人群</td><td>跨国会议同传、演讲提词、第一视角记录</td><td>手机翻译延迟卡顿关键时刻"掉链子"；提词器黑屏或误差大；AI眼镜续航不足撑不过半天；多语种离线缺位</td><td class="a">约54%</td></tr>
+    <tr><td class="k">儿童家长群体</td><td>儿童定位安全、通话社交、防沉迷</td><td>品牌社交封闭绑架；跨品牌社交受限被迫买特定品牌；室内/地下定位精度不足；安全本质被社交属性掩盖</td><td class="a">约49%</td></tr>
+  </table></div>
+  <h3>4.2 跨人群共性痛点提炼</h3>
+  <div class="chart-card"><div class="ct">图 4-1　用户共性痛点强度分布</div><div class="chart h420" id="chart-pain"></div></div>
+  <div class="note warn"><b>核心共性痛点 TOP3</b>
+    <div class="npain">
+      <div><span class="nidx">①</span><b>续航焦虑</b>：超 60% 用户不满，频繁充电中断数据连续性。</div>
+      <div><span class="nidx">②</span><b>数据不准</b>：能量消耗误差 ±21.27%、睡眠监测误差高达 180%，动摇信任根基。</div>
+      <div><span class="nidx">③</span><b>有数据无行动</b>：监测止于展示，缺个性化解读与可执行建议。</div>
+    </div>
+  </div>
+  <h3>4.3 痛点的人群交叉分析</h3>
+  <p><b>续航焦虑与数据不准是跨人群"通用痛点"</b>，在所有人群中均位居前列；"有数据无行动"在睡眠关注与银发慢病人群中尤为突出；商务差旅人群独有"关键时刻可靠性"痛点，指向端侧算力与离线能力缺失。下方热力矩阵直观呈现八类痛点 × 五类人群的影响强度。</p>
+  <div class="chart-card"><div class="ct">图 4-2　人群 × 痛点 影响强度热力矩阵</div><div class="chart h420" id="chart-heat"></div></div>
+  <div class="note info"><b>交叉分析结论</b>红色高亮区集中在<b>续航、数据不准、有数据无行动、跨平台互通</b>四列，印证它们是"跨人群通用痛点"；而"操作复杂"几乎只刺痛银发人群，"隐私担忧"在商务与儿童群体中更敏感——需求优先级由此可分层排序。</div>
+</section>
+
+<!-- 05 -->
+<section id="s5" class="reveal">
+  <div class="s-head"><div class="sn">05</div><h2>现有需求与未被满足需求</h2><p class="ss">已满足与未满足需求的清晰界分</p></div>
+  <div class="matrix">
+    <div class="mcol met"><h4>✓ 已较好满足的需求</h4><ul>
+      <li><b>基础运动记录</b><span>计步、距离、卡路里、150+运动模式已普及</span></li>
+      <li><b>连续心率监测</b><span>主流旗舰心率准确率98%+，PPG传感器成熟</span></li>
+      <li><b>消息通知与支付</b><span>NFC支付、消息提醒、蓝牙通话已成标配</span></li>
+      <li><b>基础睡眠时长统计</b><span>入睡/醒来时间、总时长记录普遍可用</span></li>
+      <li><b>儿童定位与通话</b><span>4G通话、精准定位、电子围栏成熟</span></li>
+      <li><b>时尚外观表达</b><span>表盘市场、可换表带、潮流设计</span></li>
+      <li><b>手机生态联动</b><span>查找手机、控制音乐、智能家居入口</span></li>
+    </ul></div>
+    <div class="mcol unmet"><h4>✗ 尚未被满足的需求</h4><ul>
+      <li><b>医疗级精准监测</b><span>血压/血糖/血氧无创连续精准测量仍处攻坚期</span></li>
+      <li><b>"数据→洞察→行动"闭环</b><span>监测止于数字，缺个性化解读与可执行建议</span></li>
+      <li><b>真正的长续航无感</b><span>苹果18h硬伤；医疗级高频监测难兼顾续航</span></li>
+      <li><b>夜间无感佩戴</b><span>手表笨重硌手；戒指形态提供新解但渗透率低</span></li>
+      <li><b>主动式AI健康服务</b><span>现有AI多为被动查询，缺预测性提醒与主动干预</span></li>
+      <li><b>跨设备/跨平台数据互通</b><span>苹果健康、华为运动健康、医院HIS数据孤岛严重</span></li>
+      <li><b>银发适老化深度体验</b><span>紧急呼叫、跌倒检测、慢病管理一体化不足</span></li>
+      <li><b>B端慢病管理与保险联动</b><span>"硬件+数据+服务+保险"模式试点中未规模化</span></li>
+      <li><b>AI眼镜刚需场景落地</b><span>翻译/提词刚需已现，续航/舒适/生态待完善</span></li>
+      <li><b>隐私安全与数据主权</b><span>健康数据泄露风险高，用户对数据归属缺乏掌控</span></li>
+    </ul></div>
+  </div>
+  <h3>5.1 需求演进规律：五阶跃迁模型</h3>
+  <p>用户对健康穿戴的诉求并非静态，而是沿一条价值阶梯持续上移。把握行业当前所处阶段，是判断"哪些需求值得现在做、哪些属于未来"的关键。</p>
+  <div class="evo">
+    <div class="evo-step"><div class="en">STAGE 1</div><div class="ec">记录</div><div class="ed">采集原始生理数据</div></div>
+    <div class="evo-step"><div class="en">STAGE 2</div><div class="ec">监测</div><div class="ed">连续跟踪与异常提示</div></div>
+    <div class="evo-step now"><div class="en">STAGE 3</div><div class="ec">洞察</div><div class="ed">数据解读与趋势分析<b class="badge-now">行业当前位</b></div></div>
+    <div class="evo-step"><div class="en">STAGE 4</div><div class="ec">干预</div><div class="ed">个性化可执行建议</div></div>
+    <div class="evo-step"><div class="en">STAGE 5</div><div class="ec">预测</div><div class="ed">风险预判与主动守护</div></div>
+  </div>
+  <div class="note info"><b>需求演进规律</b>用户需求沿 <b>"记录 → 监测 → 洞察 → 干预 → 预测"</b> 五阶跃迁。当前行业整体处于"监测→洞察"过渡期，AI 端侧大模型成熟使"洞察→干预→预测"闭环成为可能——这也正是第六章高价值需求的共同支点。</div>
+  <div class="chart-card"><div class="ct">图 5-1　未被满足需求的市场机会规模与紧迫度评估</div><div class="chart h420" id="chart-opportunity"></div></div>
+</section>
+
+<!-- 06 AI时代需求价值研判 -->
+<section id="s6" class="reveal">
+  <div class="s-head"><div class="sn">06</div><h2>AI 时代需求价值研判与正反论证</h2><p class="ss">以用户价值度为序，正反双向论证</p></div>
+  <p class="lead">AI 端侧大模型的成熟重新定义了需求价值的边界——过去"不可能"的主动洞察与预测干预，如今具备技术可行性。本节将五大高潜需求<b>按对用户的实际价值度排序</b>，逐一进行正反论证。排序依据为：用户获益直接性 × 痛点强度 × AI 赋能后的价值增量。</p>
+
+  <h3>6.1 需求价值度排序总览</h3>
+  <div class="vrank">
+    <div class="vrank-item"><div class="vr">01</div><div><div class="vt">"数据→洞察→行动→预测"的 AI 健康闭环</div><div class="vd">用户价值最高：直接解决 67% 用户"有数据无行动"的核心痛点，AI 把监测数据转化为可行动建议与健康预测，使设备从"记录仪"变"健康教练"。<b>AI 赋能价值增量最大</b>。</div></div></div>
+    <div class="vrank-item"><div class="vr">02</div><div><div class="vt">医疗级精准监测与 AI 主动预警</div><div class="vd">服务银发慢病 3 亿人群（痛点占比 72%），医疗级数据+AI 趋势建模实现恶化风险预判，65% 用户首要考量。价值在于把"不敢信的消费级数据"变为"可信可依的医疗级依据"。</div></div></div>
+    <div class="vrank-item"><div class="vr">03</div><div><div class="vt">长续航无感的全天候 AI 陪伴</div><div class="vd">续航焦虑是 60%+ 用户的通用痛点，且是 AI 高频监测的前提——AI 主动服务需要设备始终在线。价值在于为 AI 价值释放扫清基础障碍。</div></div></div>
+    <div class="vrank-item"><div class="vr">04</div><div><div class="vt">跨设备数据互通与统一 AI 助手</div><div class="vd">解决数据孤岛，AI 统一调度多设备数据生成全天候健康画像。价值在于打破单设备局限，但对多数单设备用户价值需多设备持有率提升才充分释放。</div></div></div>
+    <div class="vrank-item"><div class="vr">05</div><div><div class="vt">AI 原生交互与场景感知</div><div class="vd">交互从"用户找功能"到"功能找用户"，降低小屏门槛。价值高但属体验优化层，需建立在数据可信与续航无忧之上，优先级次之。</div></div></div>
+  </div>
+
+  <h3>6.2 五大需求正反论证</h3>
+
+  <h4>需求一 · "数据→行动"AI 健康闭环（价值度 ★★★★★）</h4>
+  <div class="note pos"><b>正方论证（成立）</b>① 67% 用户对"只报数字不开方"不满，需求真实强烈；② AI 大模型成本下探使个性化解读可行，端侧轻量模型可做实时异常检测、云端做深度分析；③ Oura 睡眠评分+周月报告已验证数据服务化价值，订阅模式可持续；④ 闭环提升留存与付费意愿，是软件/算法壁垒，比硬件更难复制；⑤ AI 可将"健康噱头"转化为"健康伙伴"。</div>
+  <div class="note neg"><b>反方审视（风险）</b>① 健康建议涉及医疗责任边界，合规风险高；② AI 建议质量参差，错误建议反损信任；③ 用户实际执行率低（知道≠做到），闭环效果难量化；④ 需大量临床数据训练，数据获取成本高。</div>
+  <div class="verdict"><dt>研判结论</dt><dd><b>成立，需分层设计</b>。生活方式建议（睡眠/运动/减压）优先，医疗干预须持牌合作。以"陪伴式教练"而非"处方式医生"定位降低合规风险。</dd><dt>置信度</dt><dd>★★★★☆（4/5）</dd></div>
+
+  <h4>需求二 · 医疗级精准监测与 AI 主动预警（价值度 ★★★★★）</h4>
+  <div class="note pos"><b>正方论证（成立）</b>① 65% 购买者首要考量医疗级精度，银发慢病痛点占比 72%；② 超 15 款获二类医疗器械证，监管路径已通；③ 无创血糖 84.7%、连续血压 ±5mmHg 技术临近商用；④ AI 趋势建模可实现恶化风险预判（如血压波动识别房颤风险），从"监测"升维到"预警"；⑤ 医疗认证构筑高壁垒，溢价空间大。</div>
+  <div class="note neg"><b>反方审视（风险）</b>① 无创血糖 84.7% 仍低于医疗级要求（需>95%），技术未完全成熟；② 医疗认证周期长成本高，可能拖慢迭代；③ 与专业医疗器械（CGM）精度差距仍存，可能被定义为"辅助级"而非"替代级"；④ AI 预警的假阳性可能造成用户不必要的焦虑。</div>
+  <div class="verdict"><dt>研判结论</dt><dd><b>成立，分阶段落地</b>。血压/心电/血氧优先突破（技术更成熟），血糖作 5 年期战略目标。先打"医疗辅助"定位，AI 预警须设分级机制避免焦虑。</dd><dt>置信度</dt><dd>★★★★★（5/5）</dd></div>
+
+  <h4>需求三 · 长续航无感的全天候 AI 陪伴（价值度 ★★★★☆）</h4>
+  <div class="note pos"><b>正方论证（成立）</b>① 续航焦虑是 60%+ 用户通用痛点，且是 AI 主动服务的前提（设备离线则 AI 失效）；② 小米玄戒 T1（4nm）已实现 15 天续航，证明低功耗芯片可行；③ 戒指形态 7-12 天续航验证无感路径；④ AI 端侧推理可优化功耗调度（按需唤醒）。</div>
+  <div class="note neg"><b>反方审视（风险）</b>① 医疗级高频监测与续航天然矛盾，精度提升往往以功耗为代价；② 苹果 18h 短板至今未根本解决，受限于电池化学瓶颈；③ 能量收集技术（热电/肌肤供电）仍处实验室，量产遥远；④ 用户对"无感"定义因人而异（重量/材质/佩戴位置）。</div>
+  <div class="verdict"><dt>研判结论</dt><dd><b>成立，需多路径协同</b>。短期靠低功耗芯片+AI 智能调度；中期靠形态分化（戒指补夜间）；长期靠能量收集技术突破。</dd><dt>置信度</dt><dd>★★★★☆（4/5）</dd></div>
+
+  <h4>需求四 · 跨设备数据互通与统一 AI 助手（价值度 ★★★★☆）</h4>
+  <div class="note pos"><b>正方论证（成立）</b>① 数据孤岛是进阶用户核心痛点，AI 融合多设备数据可生成全天候健康画像；② 联邦学习可在保护隐私前提下实现跨设备协同；③ 统一 AI 助手跨场景服务提升体验连贯性；④ 以数据主权与互操作性对抗封闭生态，开放策略吸引长尾设备商。</div>
+  <div class="note neg"><b>反方审视（风险）</b>① 跨品牌协议打通难，巨头封闭生态抵制；② 用户多设备持有率低，价值需规模才释放；③ 生态冷启动难，无巨头背书难成势；④ 联邦学习工程落地复杂，精度可能不及集中式。</div>
+  <div class="verdict"><dt>研判结论</dt><dd><b>成立，需长周期</b>。先自有设备闭环验证价值，再逐步开放。适合有生态野心且耐心的玩家，3-5 年期。</dd><dt>置信度</dt><dd>★★★☆☆（3/5）</dd></div>
+
+  <h4>需求五 · AI 原生交互与场景感知（价值度 ★★★☆☆）</h4>
+  <div class="note pos"><b>正方论证（成立）</b>① 小屏设备交互门槛高，AI 多模态（语音/手势/视线）可降摩擦；② AI Agent 主动感知场景（入会自动静音、跌倒自动呼救）实现无感智能；③ 端侧大模型使离线场景感知可行；④ 苹果"环境智能"理念验证方向价值。</div>
+  <div class="note neg"><b>反方审视（风险）</b>① 端侧算力+续航+隐私合规三重挑战；② Humane AI Pin 失败证明"形态可超前，模型成熟度是生死线"；③ 持续环境感知的隐私争议（第一视角拍摄）可能遇监管；④ 消费者接受度未验证，属体验优化层需建立在前述需求之上。</div>
+  <div class="verdict"><dt>研判结论</dt><dd><b>中长期成立，短期需场景聚焦</b>。先打透商务翻译/提词等明确刚需，普适环境感知待模型与续航成熟，5 年期布局。</dd><dt>置信度</dt><dd>★★★☆☆（3/5）</dd></div>
+
+  <div class="chart-card"><div class="ct">图 6-1　五大需求可行性-用户价值-AI赋能增量综合评估</div><div class="chart h420" id="chart-bubble"></div></div>
+</section>
+
+<!-- 07 AI驱动的功能性创新 -->
+<section id="s7" class="reveal">
+  <div class="s-head"><div class="sn">07</div><h2>AI 驱动的功能性创新与场景论证</h2><p class="ss">侧重功能性提升，按用户价值度排序，分场景论证</p></div>
+  <p class="lead">AI 的价值不在"更聪明的问答"，而在<b>把数据变成行动、把设备变成伙伴</b>。本章聚焦 AI 如何实现<b>功能性提升</b>（而非硬件规格升级），提出五大创新方向，并逐一在具体使用场景中论证其功能增益与可行性。</p>
+
+  <div class="bridge">📌 <b>逻辑衔接</b>：第六章已验证五大高价值需求，本章即其<b>解法层</b>——五大创新方向与前述需求<b>一一对应</b>：<b>闭环需求 ↔ 健康洞察引擎</b>、<b>医疗预警需求 ↔ 主动预警干预</b>、<b>长续航需求 ↔ 场景化交互</b>（续航是交互始终在线的前提）、<b>跨设备互通 ↔ 多设备协同中台</b>、<b>AI 原生交互需求 ↔ AI 原生形态</b>。下文沿同一价值度排序展开。</div>
+
+  <h3>7.1 创新方向价值度排序</h3>
+  <div class="vrank">
+    <div class="vrank-item"><div class="vr">01</div><div><div class="vt">AI 健康洞察引擎：从记录到洞察预测</div><div class="vd">功能提升：将原始生理数据转化为<b>自然语言健康报告+个性化干预方案+风险预测</b>。最高频、最普适，覆盖全部健康关注用户。</div></div></div>
+    <div class="vrank-item"><div class="vr">02</div><div><div class="vt">AI 主动预警与干预：从被动监测到主动守护</div><div class="vd">功能提升：异常自动分级预警+用药提醒+复诊调度+紧急联动。直接关乎安全与生命，银发慢病场景价值极高。</div></div></div>
+    <div class="vrank-item"><div class="vr">03</div><div><div class="vt">AI 场景化智能交互：从指令执行到意图理解</div><div class="vd">功能提升：多模态理解+AI Agent 主动服务，降低小屏交互门槛。商务/运动/日常多场景赋能。</div></div></div>
+    <div class="vrank-item"><div class="vr">04</div><div><div class="vt">AI 多设备协同中台：从单点监测到全天候画像</div><div class="vd">功能提升：跨设备数据融合+统一 AI 助手，生成连续健康画像。多设备持有者价值显著。</div></div></div>
+    <div class="vrank-item"><div class="vr">05</div><div><div class="vt">AI 原生形态创新：从附属配件到独立智能终端</div><div class="vd">功能提升：AI 让无屏/小屏设备具备独立智能，催生眼镜/吊坠/别针新形态。长期想象空间大。</div></div></div>
+  </div>
+
+  <h3>7.2 功能性创新方向与场景论证</h3>
+
+  <div class="hypo">
+    <span class="hn">创新 01</span>
+    <h4>AI 健康洞察引擎：从记录到洞察预测</h4>
+    <p><b>功能提升本质</b>：把穿戴设备从"健康记录仪"升级为"健康教练"。端侧轻量模型做实时异常检测（心率骤变、血氧骤降），云端大模型对周/月数据做深度分析，生成自然语言健康报告、个性化干预方案与风险预测。</p>
+    <dl class="form">
+      <dt>健康管理场景</dt><dd>睡眠关注人群夜间数据 → AI 生成睡眠评分+深睡/HRV 趋势 → 推送"本周压力周期上升，建议周三前早睡" → 长期建模发现房颤等隐患</dd>
+      <dt>运动健身场景</dt><dd>训练数据 → AI 评估恢复状态与训练负荷 → 主动建议"今日应低强度恢复"而非被动记录 → 预防过度训练伤病</dd>
+      <dt>功能增益</dt><dd>直击 67%"有数据无行动"痛点；数据从"看"变"懂"、从"事后"到"事前"；显著提升留存与付费意愿</dd>
+    </dl>
+  </div>
+
+  <div class="hypo">
+    <span class="hn">创新 02</span>
+    <h4>AI 主动预警与干预：从被动监测到主动守护</h4>
+    <p><b>功能提升本质</b>：AI 持续分析医疗级数据趋势，主动预警恶化风险并分级响应，联动家庭医生与社区医疗，打通"监测-预警-干预-就医"全链路。</p>
+    <dl class="form">
+      <dt>银发慢病场景</dt><dd>血压/血糖/心电趋势 → AI 识别波动模式预判房颤风险 → 轻度异常推用户、中度告子女、重度连签约医生 → 用药提醒+复诊智能调度</dd>
+      <dt>安全守护场景</dt><dd>跌倒检测+GPS → AI 判断跌倒严重程度（姿态+静止时长）→ 误报自动取消、真跌倒自动呼救并定位 → 独居老人安全保障</dd>
+      <dt>功能增益</dt><dd>覆盖 3 亿银发慢病蓝海；从"工具"到"慢病管家"；"孝心经济"打动子女付费，与保险联动开辟可持续收入</dd>
+    </dl>
+  </div>
+
+  <div class="hypo">
+    <span class="hn">创新 03</span>
+    <h4>AI 场景化智能交互：从指令执行到意图理解</h4>
+    <p><b>功能提升本质</b>：端侧大模型理解自然语言+手势+视线多模态输入，AI Agent 主动感知场景并执行任务，而非等待指令。交互从"用户找功能"变为"功能找用户"。</p>
+    <dl class="form">
+      <dt>商务差旅场景</dt><dd>会议开始 → AI 自动记录与同传；异国问路 → 抬眼即翻译；演讲 → 动态视距提词跟随视线；结束 → 自动生成会议摘要</dd>
+      <dt>运动场景</dt><dd>识别运动类型自动切换模式；实时语音指导（"配速偏快，建议降5秒"）；异常心率自动预警并建议停止</dd>
+      <dt>日常场景</dt><dd>入会自动静音；检测疲劳提醒休息；抬手即看所需信息（基于时间/位置/日程预测）</dd>
+      <dt>功能增益</dt><dd>降低小屏交互门槛；解决商务"关键时刻掉链子"；端侧离线=隐私+稳定双卖点</dd>
+    </dl>
+  </div>
+
+  <div class="hypo">
+    <span class="hn">创新 04</span>
+    <h4>AI 多设备协同中台：从单点监测到全天候画像</h4>
+    <p><b>功能提升本质</b>：AI 打破单一硬件局限，构建跨形态（手表+戒指+眼镜+贴片）数据中台，统一 AI 助手调度多设备数据，生成全天候连续健康画像。</p>
+    <dl class="form">
+      <dt>多设备协同场景</dt><dd>日间手表（运动/心率）+ 夜间戒指（睡眠/HRV）+ 专注场景眼镜（疲劳监测）→ AI 时序对齐与融合分析 → 生成 24 小时连续健康画像 → 统一助手跨设备主动服务</dd>
+      <dt>医疗对接场景</dt><dd>多设备数据汇聚 → AI 生成医疗级连续报告 → 对接医院 HIS 系统 → 远程诊疗依据 → 保险联动保费优惠</dd>
+      <dt>功能增益</dt><dd>破解数据孤岛；以数据主权与互操作性对抗封闭生态；从"卖单品"到"卖体系"提升 LTV</dd>
+    </dl>
+  </div>
+
+  <div class="hypo">
+    <span class="hn">创新 05</span>
+    <h4>AI 原生形态创新：从附属配件到独立智能终端</h4>
+    <p><b>功能提升本质</b>：AI 让"无屏/小屏"设备具备独立智能，形态由 AI 能力定义而非屏幕。催生 AI 眼镜、吊坠、别针等 AI 原生穿戴品类，摆脱对手机的依赖。</p>
+    <dl class="form">
+      <dt>AI 原生眼镜场景</dt><dd>端侧大模型本地运行 → 第一视角感知环境 → 主动提供翻译/提词/记录/导航 → 成为"戴在脸上的 AI 助手"，而非手机附属屏</dd>
+      <dt>环境感知终端场景</dt><dd>多模态传感器+端侧 AI 持续感知环境 → AI Agent 基于场景主动行动（入会静音/跌倒呼救/疲劳提醒）→ 真正无感智能</dd>
+      <dt>功能增益</dt><dd>突破"手表包打天下"形态瓶颈；开辟全新计算入口；2027 年前后 AI 个人终端或迎爆发</dd>
+    </dl>
+  </div>
+
+  <h3>7.3 创新可行性论证</h3>
+  <p>从<b>技术可行性、商业可行性</b>两维度评估，并指出关键风险与破局点。</p>
+  <div class="tbl-wrap"><table>
+    <tr><th style="width:10%">创新</th><th style="width:20%">技术可行性</th><th style="width:20%">商业可行性</th><th>关键风险与破局点</th></tr>
+    <tr><td class="k">01<br>健康洞察引擎</td><td class="g">★★★★★<br>端侧+云端 AI 已成熟，Oura/华为已部分实现</td><td class="g">★★★★☆<br>订阅模式验证，付费意愿待培育</td><td>风险：AI 建议合规边界、用户执行率低。破局：先生活方式建议，医疗干预持牌合作</td></tr>
+    <tr><td class="k">02<br>主动预警干预</td><td class="g">★★★★★<br>医疗级监测已认证，AI 预警算法可训练</td><td class="g">★★★★★<br>银发蓝海+孝心经济+B端采购+保险</td><td>风险：医疗认证周期、公立体系对接。破局：先 C 端子女购买，逐步打通 B 端</td></tr>
+    <tr><td class="k">03<br>场景化智能交互</td><td class="a">★★★★☆<br>端侧大模型可行，续航与光学仍需突破</td><td class="g">★★★★☆<br>商务刚需付费意愿强，企业版可授权</td><td>风险：续航 2-4h 难全天候、Meta 生态挤压。破局：先垂直商务场景，配充电眼镜盒</td></tr>
+    <tr><td class="k">04<br>多设备协同中台</td><td class="a">★★★☆☆<br>跨品牌协议难，联邦学习落地复杂</td><td class="a">★★★☆☆<br>用户多设备持有率低，生态冷启动</td><td>风险：巨头封闭生态抵制、冷启动难。破局：先自有设备闭环，再开放吸引长尾</td></tr>
+    <tr><td class="k">05<br>AI 原生形态</td><td class="r">★★☆☆☆<br>端侧算力+续航+隐私合规三重挑战</td><td class="a">★★★☆☆<br>消费级接受度未验证，专业场景可先行</td><td>风险：欧盟隐私合规、Humane 失败教训。破局：先医疗/工业专业场景，模型成熟后再消费化</td></tr>
+  </table></div>
+  <div class="chart-card"><div class="ct">图 7-1　五大创新方向技术可行性-商业可行性评估</div><div class="chart h420" id="chart-ai-hypo"></div></div>
+  <div class="note info"><b>创新落地优先级</b>创新 02（主动预警干预）> 创新 01（健康洞察引擎）> 创新 03（场景化交互）> 创新 04（多设备协同）> 创新 05（AI 原生形态）。前两者技术与商业双就绪，属近期可落地的 AI 赋能近场机会；创新 03 技术接近成熟需续航突破；创新 04/05 技术与商业均需较长培育周期，属战略级布局。</div>
+</section>
+
+<!-- 08 行业创新产品参考 -->
+<section id="s8" class="reveal">
+  <div class="s-head"><div class="sn">08</div><h2>行业创新产品参考</h2><p class="ss">上市与未上市创新产品亮点速览</p></div>
+  <h3>8.1 已上市创新产品</h3>
+  <div class="innov-grid">
+    <div class="innov"><div class="ih"><div><div class="it">Oura Ring 4</div><div class="ib">智能戒指 · 估值52亿美元</div></div><span class="badge new">开创者</span></div><ul><li>7-8天无感佩戴，医疗级医院标准数据格式</li><li>睡眠"评分化"可发现房颤</li><li>硬件+$6/月订阅验证商业闭环</li><li>NBA/UFC/马斯克背书，精英心智</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">Meta Ray-Ban Gen 2</div><div class="ib">AI眼镜 · 2025年740万台</div></div><span class="badge hot">引爆者</span></div><ul><li>49g+大牌均价，多重体验融合</li><li>骁龙AR1+Llama 4，AI随身化</li><li>带屏版本发布，向AR平台演进</li><li>硬件不赚钱靠软件订阅变现</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">灵析无创血糖戒指</div><div class="ib">医疗级 · 国产创新</div></div><span class="badge warm">技术前沿</span></div><ul><li>BGEM™ 84.7%准确率，通过KK医院验证</li><li>与连续血压手表构成"无创双翼"</li><li>开启慢病预防数字化</li><li>从"健身玩具"到"健康哨兵"</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">华为 WATCH 5 X-TAP</div><div class="ib">智能手表 · 医疗级交互</div></div><span class="badge cool">交互创新</span></div><ul><li>指尖血氧±1%、30秒高血压风险筛查</li><li>17项微体检含卵巢功能/HRV评估</li><li>与瑞金医院合作，数据直连三甲</li><li>鸿蒙AI小艺+手势操控+星闪</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">Apple Watch 睡眠呼吸暂停</div><div class="ib">智能手表 · FDA认证</div></div><span class="badge cool">权威认证</span></div><ul><li>首个FDA认证睡眠呼吸暂停消费级检测</li><li>体温+HRV经期预测90%+</li><li>车祸检测<3秒+卫星SOS</li><li>以权威认证构建医疗级信任</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">INMO GO3 AR</div><div class="ib">AI眼镜 · 国产端侧</div></div><span class="badge new">端侧突破</span></div><ul><li>千问-Qwen-Edge(1.2B)端侧全离线</li><li>六语种同传320ms，CATTI准确率91.4%</li><li>动态视距补偿提词，±8°自动微调</li><li>79g医用级鼻托，4h无压痕</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">小米玄戒T1手环</div><div class="ib">智能手环 · 自研芯片</div></div><span class="badge cool">性价比极致</span></div><ul><li>自研玄戒T1(4nm)集成4G基带，续航15天</li><li>磁吸快充5分钟用2天</li><li>心率血氧98.2%，150+运动模式</li><li>人车家全场景入口</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">三星 Galaxy Ring</div><div class="ib">智能戒指 · 生态巨头入局</div></div><span class="badge exp">巨头跟进</span></div><ul><li>AI健康检测，睡眠/健身/心率三合一</li><li>三星生态联动，验证戒指补充形态</li><li>巨头入局推动品类教育</li><li>生态整合 vs 独立品牌深度之争</li></ul></div>
+  </div>
+  <h3>8.2 未上市/在研创新产品</h3>
+  <div class="innov-grid">
+    <div class="innov"><div class="ih"><div><div class="it">苹果 AI 别针（在研）</div><div class="ib">AI可穿戴 · 预计2027年</div></div><span class="badge new">概念</span></div><ul><li>AirTag大小吊坠，低分辨率摄像头+麦克风</li><li>定位iPhone"眼睛和耳朵"，环境智能</li><li>AI不需等点击，传感器主动感知服务</li><li>挑战：欧盟GDPR/ePrivacy/AI Act合规</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">苹果带摄像头 AirPods(H90)</div><div class="ib">AI耳机 · 已进DVT</div></div><span class="badge new">在研</span></div><ul><li>低分辨率红外传感器（同源Face ID）</li><li>环境扫描：感知深度/轮廓/动静喂给AI</li><li>因欧盟隐私合规风险部分产线暂搁</li><li>重新定义耳机为"环境感知终端"</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">苹果智能眼镜 N50</div><div class="ib">AI眼镜 · 对标Ray-Ban</div></div><span class="badge new">在研</span></div><ul><li>对标Meta Ray-Ban的智能眼镜</li><li>配合AI别针/AirPods构成硬件全家桶</li><li>2027年前后集中爆发计划</li><li>苹果品牌人设与隐私合规的双刃剑</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">OpenAI AI原生硬件全家桶</div><div class="ib">AI硬件 · 2027-2028</div></div><span class="badge new">跨界</span></div><ul><li>与联发科/高通合作处理器，立讯代工</li><li>$200-300智能音箱、代号Dime鹅卵石耳机</li><li>智能眼镜、智能灯、AI笔多线布局</li><li>从模型到系统到硬件全栈自研</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">Meta AI吊坠+Artemis AR</div><div class="ib">AI硬件 · 2027年</div></div><span class="badge new">在研</span></div><ul><li>明年春天推AI吊坠，可能带摄像头</li><li>Artemis AR+SSG"超感知"眼镜原型测试</li><li>配Muse Spark模型+Hatch消费级agent</li><li>硬件+订阅+开发者平台+企业服务全栈</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">热电薄膜/肌肤供电穿戴</div><div class="ib">前沿技术 · 实验室阶段</div></div><span class="badge exp">前沿</span></div><ul><li>昆士兰科技大学超薄柔性热电薄膜</li><li>CMU"Power-over-Skin"人体射频能量供电</li><li>河南大学多功能智能纺织品</li><li>目标：永不充电、真正无感形态</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">Afon Technology 无创CGM</div><div class="ib">医疗级 · 临床推进</div></div><span class="badge warm">攻坚</span></div><ul><li>全球首款无创可穿戴连续血糖监测仪</li><li>与巴塞罗那大学合作，提升依从性</li><li>正积极推进临床试验</li><li>攻克智能穿戴"圣杯"级技术</li></ul></div>
+    <div class="innov"><div class="ih"><div><div class="it">苹果智能戒指（专利已批）</div><div class="ib">智能戒指 · 专利阶段</div></div><span class="badge new">专利</span></div><ul><li>内置大量传感器，精准捕捉手势/触摸/指向</li><li>配合Vision Pro，轻动手指控制虚拟空间</li><li>无需笨拙"捏合"，自然手势交互</li><li>苹果多线布局戒指赛道信号</li></ul></div>
+  </div>
+  <h3>8.3 失败教训：被"复活"的 AI 硬件</h3>
+  <div class="innov-grid">
+    <div class="innov lesson"><div class="ih"><div><div class="it">Humane AI Pin（已停产）</div><div class="ib">AI胸针 · $699+$24/月</div></div><span class="badge hot">失败案例</span></div><ul><li>前苹果员工创立，脱离手机屏幕的AI随身硬件</li><li>MKBHD评"最差产品"，不到一年卖给惠普停产</li><li>失败：2024年模型不足，识别慢/答非所问/续航拉胯</li><li>教训：形态选对，但时机与模型成熟度未到</li></ul></div>
+    <div class="innov lesson"><div class="ih"><div><div class="it">Rabbit R1 及各类挂脖吊坠</div><div class="ib">AI硬件 · 已被证伪</div></div><span class="badge hot">失败案例</span></div><ul><li>与AI Pin同期被证伪，"AI硬件"成"智商税"</li><li>如今被Meta/苹果/OpenAI集体"复活"重新布局</li><li>关键转变：端侧算力上来+多模态今非昔比+自研模型</li><li>启示：2027年前后AI个人终端或迎小爆发</li></ul></div>
+  </div>
+</section>
+
+<!-- 参考链接 -->
+<div class="refs">
+  <h3>参考来源</h3>
+  <ol>
+    <li><a href="https://www.cnii.com.cn/gxxww/rmydb/202603/t20260319_726275.html"><b>IDC《中国可穿戴设备市场季度跟踪报告》</b></a> — 2025年中国腕戴设备市场出货量数据</li>
+    <li><a href="https://wearable.ofweek.com/2026-02/ART-8420-5000-30681200.html"><b>洛图科技（RUNTO）《中国智能腕戴设备零售市场月度追踪报告》</b></a> — 2025年报，分品类销量与份额</li>
+    <li><a href="https://www.iim.net.cn/2208/view-136354-1.html"><b>IIM信息《中国健康与医疗监测智能穿戴市场分析调查报告（2025）》</b></a> — 医疗级穿戴市场规模与监管</li>
+    <li><a href="https://www.sohu.com/a/1042928934_447547"><b>Omdia / Counterpoint 智能眼镜市场报告</b></a> — 2025全球智能眼镜出货量与Meta份额数据</li>
+    <li><a href="https://finance.sina.com.cn/tech/roll/2025-10-16/doc-infuacvq1220738.shtml"><b>新浪财经《智能戒指的成功密码与中国品牌出海战略深度解析》</b></a> — Oura/Ultrahuman/RingConn战略</li>
+    <li><a href="https://cj.sina.com.cn/articles/view/7879848900/1d5acf3c401902mu76"><b>新浪财经《健康穿戴品牌用户痛点分析：续航不足、数据不准如何解决？》</b></a> — 用户痛点与解决方向</li>
+    <li><a href="https://www.sohu.com/a/966029758_121823491"><b>搜狐《2025智能穿戴设备体验设计研究报告》</b></a> — 用户需求深化与体验痛点</li>
+    <li><a href="https://www.sohu.com/a/979925197_121123901"><b>搜狐《2026年智能穿戴设备行业深度：深度聚焦健康管理赛道》</b></a> — 健康管理三阶段演进</li>
+    <li><a href="https://www.toutiao.com/article/7529844922472546867/"><b>今日头条《2025智能手表测评：华为苹果三星小米旗舰横评》</b></a> — 旗舰产品参数对比</li>
+    <li><a href="https://www.sohu.com/a/1044829344_121081803"><b>搜狐《2026年AI智能眼镜横评：INMO GO3 AR vs Rokid Max、XREAL Beam、Meta Ray-Ban》</b></a> — AI眼镜能力对比</li>
+    <li><a href="https://www.jiemian.com/article/13593145.html"><b>界面新闻《国产智能穿戴破局！灵析生物攻克无创血糖监测》</b></a> — 无创血糖/血压技术进展</li>
+    <li><a href="https://www.sohu.com/a/916781629_100262162"><b>搜狐《苹果智能戒指专利获批》</b></a> — 苹果戒指专利与手势交互</li>
+    <li><a href="https://www.sohu.com/a/978666577_130887"><b>搜狐《报道称苹果正开发可穿戴AI别针，预计2027年推出》</b></a> — 苹果AI硬件全家桶</li>
+    <li><a href="https://news.qq.com/rain/a/20260531A04KDR00"><b>腾讯新闻《最失败的AI硬件，被苹果、OpenAI、Meta抢着"复活"》</b></a> — Humane失败教训与巨头AI硬件布局</li>
+    <li><a href="https://www.chinairn.com/news/20260611/100002106.shtml"><b>中研普华《2026年中国智能穿戴行业技术创新与应用场景展望》</b></a> — 技术创新方向与场景落地</li>
+    <li><a href="https://baike.baidu.com/item/%E5%8F%AF%E7%A9%BF%E6%88%B4%E8%AE%BE%E5%A4%87/5968591"><b>百度百科：可穿戴设备 / 智能戒指</b></a> — 市场规模预测与品类定义</li>
+  </ol>
+</div>
+
+<footer>
+  <p>本报告基于公开市场数据与行业研究综合分析，数据截至2026年7月。</p>
+  <p>数据来源：IDC、洛图科技(RUNTO)、IIM信息、Counterpoint、Omdia及各品牌公开资料。</p>
+  <p>仅供研究与决策参考，不构成投资建议。</p>
+</footer>
+
+</div>
+
+<button class="totop" id="totop" aria-label="返回顶部">↑</button>
+
+<script>
+const FONT={fontFamily:'-apple-system,BlinkMacSystemFont,"SF Pro Display","Segoe UI","PingFang SC","Microsoft YaHei","Helvetica Neue",sans-serif'};
+const baseTextStyle={...FONT,color:'#1d1d1f'};
+const C=['#0071e3','#2997ff','#059669','#d97706','#86868b','#d2d2d7'];
+
+// 图2-1 赛道矩阵
+echarts.init(document.getElementById('chart-seg')).setOption({
+  color:C,
+  grid:{left:'9%',right:'8%',bottom:'14%',top:'10%'},
+  xAxis:{name:'市场成熟度 →',type:'value',min:0,max:100,nameLocation:'middle',nameGap:30,
+    nameTextStyle:{...FONT,color:'#6e6e73'},axisLine:{lineStyle:{color:'#d2d2d7'}},
+    splitLine:{lineStyle:{color:'#f5f5f7'}},axisLabel:{color:'#86868b'}},
+  yAxis:{name:'增长力 →',type:'value',min:0,max:100,nameLocation:'middle',nameGap:38,
+    nameTextStyle:{...FONT,color:'#6e6e73'},axisLine:{lineStyle:{color:'#d2d2d7'}},
+    splitLine:{lineStyle:{color:'#f5f5f7'}},axisLabel:{color:'#86868b'}},
+  tooltip:{trigger:'item',formatter:function(p){return p.data.name+'<br/>成熟度:'+p.data.value[0]+'<br/>增长力:'+p.data.value[1]}},
+  series:[{type:'scatter',symbolSize:26,
+    data:[{name:'智能手表',value:[88,35]},{name:'智能手环',value:[92,25]},{name:'儿童手表',value:[80,28]},
+      {name:'智能戒指',value:[30,82]},{name:'AI智能眼镜',value:[38,90]},{name:'TWS耳机',value:[85,22]},
+      {name:'医疗级穿戴',value:[45,75]},{name:'智能服装',value:[12,60]}],
+    label:{show:true,formatter:function(p){return p.data.name},position:'right',color:'#1d1d1f',fontSize:12,...FONT},
+    labelLayout:{hideOverlap:false}
+  }]
+});
+
+// 图2-2 增长动能对比
+echarts.init(document.getElementById('chart-growth')).setOption({
+  grid:{left:'22%',right:'10%',top:'8%',bottom:'8%'},
+  tooltip:{trigger:'axis',axisPointer:{type:'shadow'},formatter:function(p){return p[0].name+'<br/>'+p[0].value+'%<br/><span style="color:#86868b;font-size:11px">'+p[0].data.basis+'</span>'}},
+  xAxis:{type:'value',axisLabel:{formatter:'{value}%',color:'#86868b'},axisLine:{lineStyle:{color:'#d2d2d7'}},splitLine:{lineStyle:{color:'#f5f5f7'}}},
+  yAxis:{type:'category',data:['腕戴(整体)','成人手表','智能手环','医疗级(年复合)','中国AR眼镜','全球眼镜(Meta)'],
+    axisLine:{lineStyle:{color:'#d2d2d7'}},axisLabel:{color:'#1d1d1f',fontSize:12,...FONT}},
+  series:[{type:'bar',barWidth:'52%',
+    data:[
+      {value:20.8,basis:'2025 同比 · IDC'},{value:17.2,basis:'2025 同比 · 洛图'},{value:29.4,basis:'2025 同比 · 洛图'},
+      {value:40,basis:'年复合增速 · IIM'},{value:147,basis:'2025 同比 · 中国AR'},{value:281,basis:'2025 同比 · Meta'}
+    ],
+    itemStyle:{borderRadius:[0,6,6,0],color:function(p){return p.dataIndex>=4?'#e02424':(p.dataIndex===3?'#059669':'#0071e3')}},
+    label:{show:true,position:'right',formatter:'{c}%',color:'#1d1d1f',fontSize:12,...FONT}
+  }]
+});
+
+// 图3-1 折线图
+echarts.init(document.getElementById('chart-trend')).setOption({
+  color:C,
+  legend:{bottom:0,textStyle:baseTextStyle},
+  grid:{left:'8%',right:'6%',bottom:'14%',top:'10%'},
+  tooltip:{trigger:'axis',formatter:function(p){let s=p[0].axisValue+'年<br/>';p.forEach(i=>s+=i.marker+i.seriesName+': '+i.value+'%<br/>');return s}},
+  xAxis:{type:'category',data:['2021','2022','2023','2024','2025'],axisLine:{lineStyle:{color:'#d2d2d7'}},axisLabel:{color:'#86868b',...FONT}},
+  yAxis:{type:'value',name:'出货量占比(%)',nameTextStyle:{...FONT,color:'#6e6e73'},
+    axisLine:{lineStyle:{color:'#d2d2d7'}},splitLine:{lineStyle:{color:'#f5f5f7'}},axisLabel:{color:'#86868b',formatter:'{value}%'}},
+  series:[
+    {name:'智能手表',type:'line',smooth:true,data:[52,55,58,62,68],symbolSize:8,lineStyle:{width:3}},
+    {name:'智能手环',type:'line',smooth:true,data:[40,36,32,28,25],symbolSize:8,lineStyle:{width:3}},
+    {name:'TWS耳机',type:'line',smooth:true,data:[6,7,8,8,5],symbolSize:8,lineStyle:{width:3}},
+    {name:'智能戒指',type:'line',smooth:true,data:[0.2,0.5,1,1.5,2.5],symbolSize:8,lineStyle:{width:3}},
+    {name:'AI智能眼镜',type:'line',smooth:true,data:[0.1,0.2,0.5,1.2,3],symbolSize:8,lineStyle:{width:3}},
+    {name:'医疗级穿戴',type:'line',smooth:true,data:[1,1.5,2.5,4,6.5],symbolSize:8,lineStyle:{width:3}}
+  ]
+});
+
+// 图3-2 手表雷达
+echarts.init(document.getElementById('chart-watch-radar')).setOption({
+  color:['#0071e3','#e02424','#059669','#d97706','#86868b'],
+  legend:{bottom:0,textStyle:baseTextStyle},
+  radar:{indicator:[{name:'健康监测',max:10},{name:'AI交互',max:10},{name:'续航能力',max:10},{name:'生态协同',max:10},{name:'性价比',max:10},{name:'医疗认证',max:10}],
+    radius:'60%',splitArea:{areaStyle:{color:['#fbfbfd','#f5f5f7']}},axisName:{color:'#6e6e73',fontSize:12,...FONT}},
+  series:[{type:'radar',data:[
+    {name:'苹果 S10',value:[8,8,3,10,4,8],areaStyle:{opacity:.1}},
+    {name:'华为 WATCH5',value:[9,9,6,9,6,9],areaStyle:{opacity:.1}},
+    {name:'小米 S4',value:[7,6,9,8,9,4],areaStyle:{opacity:.1}},
+    {name:'三星 W8',value:[7,7,5,7,6,5],areaStyle:{opacity:.1}},
+    {name:'佳明 Fenix',value:[6,4,10,4,3,6],areaStyle:{opacity:.1}}
+  ]}]
+});
+
+// 图3-3 手环雷达
+echarts.init(document.getElementById('chart-band-radar')).setOption({
+  color:['#0071e3','#2997ff','#059669','#d97706'],
+  legend:{bottom:0,textStyle:baseTextStyle},
+  radar:{indicator:[{name:'健康监测',max:10},{name:'续航能力',max:10},{name:'性价比',max:10},{name:'AI交互',max:10},{name:'屏幕体验',max:10},{name:'生态联动',max:10}],
+    radius:'60%',splitArea:{areaStyle:{color:['#fbfbfd','#f5f5f7']}},axisName:{color:'#6e6e73',fontSize:12,...FONT}},
+  series:[{type:'radar',data:[
+    {name:'小米手环10',value:[7,9,10,6,7,9],areaStyle:{opacity:.12}},
+    {name:'华为手环10',value:[8,8,8,7,7,9],areaStyle:{opacity:.12}},
+    {name:'入门下沉款',value:[5,9,10,4,5,5],areaStyle:{opacity:.12}},
+    {name:'AI升级款(趋势)',value:[8,7,7,9,8,8],areaStyle:{opacity:.12}}
+  ]}]
+});
+
+// 图3-4 戒指雷达
+echarts.init(document.getElementById('chart-ring-compare')).setOption({
+  color:['#86868b','#e02424','#059669'],
+  legend:{bottom:0,textStyle:baseTextStyle},
+  radar:{indicator:[{name:'续航能力',max:10},{name:'数据深度',max:10},{name:'品牌溢价',max:10},{name:'性价比',max:10},{name:'生态联动',max:10},{name:'医疗认可',max:10}],
+    radius:'60%',splitArea:{areaStyle:{color:['#fbfbfd','#f5f5f7']}},axisName:{color:'#6e6e73',fontSize:12,...FONT}},
+  series:[{type:'radar',data:[
+    {name:'Oura Ring',value:[8,9,9,4,6,9],areaStyle:{opacity:.12}},
+    {name:'Ultrahuman',value:[7,7,8,4,5,7],areaStyle:{opacity:.12}},
+    {name:'RingConn',value:[10,6,5,8,5,5],areaStyle:{opacity:.12}}
+  ]}]
+});
+
+// 图3-5 眼镜雷达
+echarts.init(document.getElementById('chart-glasses-radar')).setOption({
+  color:['#e02424','#86868b','#d97706','#0071e3'],
+  legend:{bottom:0,textStyle:baseTextStyle},
+  radar:{indicator:[{name:'端侧AI',max:10},{name:'翻译能力',max:10},{name:'提词体验',max:10},{name:'续航',max:10},{name:'佩戴舒适',max:10},{name:'拍摄',max:10}],
+    radius:'60%',splitArea:{areaStyle:{color:['#fbfbfd','#f5f5f7']}},axisName:{color:'#6e6e73',fontSize:12,...FONT}},
+  series:[{type:'radar',data:[
+    {name:'Meta Ray-Ban G2',value:[6,5,2,3,8,6],areaStyle:{opacity:.1}},
+    {name:'INMO GO3 AR',value:[9,9,9,5,8,9],areaStyle:{opacity:.1}},
+    {name:'Rokid Max',value:[8,7,5,5,6,7],areaStyle:{opacity:.1}},
+    {name:'XREAL Beam',value:[4,5,4,6,7,6],areaStyle:{opacity:.1}}
+  ]}]
+});
+
+// 图3-6 耳机雷达
+echarts.init(document.getElementById('chart-ear-radar')).setOption({
+  color:['#e02424','#0071e3','#86868b','#059669'],
+  legend:{bottom:0,textStyle:baseTextStyle},
+  radar:{indicator:[{name:'音质降噪',max:10},{name:'AI语音助手',max:10},{name:'健康监测',max:10},{name:'续航能力',max:10},{name:'佩戴舒适',max:10},{name:'生态联动',max:10}],
+    radius:'60%',splitArea:{areaStyle:{color:['#fafafc','#f5f5f7']}},axisName:{color:'#6e6e73',fontSize:12,...FONT}},
+  series:[{type:'radar',data:[
+    {name:'苹果AirPods Pro',value:[9,8,4,6,8,10],areaStyle:{opacity:.1}},
+    {name:'传统TWS旗舰',value:[9,5,3,7,8,6],areaStyle:{opacity:.1}},
+    {name:'开放式OWS(国产)',value:[7,6,4,8,9,6],areaStyle:{opacity:.1}},
+    {name:'音频+健康融合(趋势)',value:[7,8,8,6,7,8],areaStyle:{opacity:.1}}
+  ]}]
+});
+
+// 图3-7 医疗级雷达
+echarts.init(document.getElementById('chart-medical-radar')).setOption({
+  color:['#e02424','#d97706','#0071e3','#059669','#86868b'],
+  legend:{bottom:0,textStyle:baseTextStyle},
+  radar:{indicator:[{name:'技术成熟度',max:10},{name:'监测精度',max:10},{name:'医疗认证',max:10},{name:'商业化进度',max:10},{name:'用户接受度',max:10},{name:'成本可控性',max:10}],
+    radius:'60%',splitArea:{areaStyle:{color:['#fafafc','#f5f5f7']}},axisName:{color:'#6e6e73',fontSize:12,...FONT}},
+  series:[{type:'radar',data:[
+    {name:'连续血压(华为/小米)',value:[8,8,8,8,7,6],areaStyle:{opacity:.12}},
+    {name:'无创血糖(灵析/Afon)',value:[5,6,4,4,5,3],areaStyle:{opacity:.12}},
+    {name:'睡眠呼吸暂停(苹果)',value:[8,8,9,9,7,7],areaStyle:{opacity:.12}},
+    {name:'心电ECG(华为/苹果)',value:[8,8,9,8,7,6],areaStyle:{opacity:.12}},
+    {name:'血氧SpO2(普及)',value:[9,7,7,9,8,9],areaStyle:{opacity:.12}}
+  ]}]
+});
+
+// 图4-1 痛点
+echarts.init(document.getElementById('chart-pain')).setOption({
+  grid:{left:'24%',right:'10%',top:'6%',bottom:'6%'},
+  xAxis:{type:'value',max:80,axisLine:{lineStyle:{color:'#d2d2d7'}},splitLine:{lineStyle:{color:'#f5f5f7'}},axisLabel:{color:'#86868b'}},
+  yAxis:{type:'category',data:['跨平台数据不互通','隐私安全担忧','AI不够智能','医疗级精度不足','操作复杂/字小','有数据无行动建议','夜间佩戴不适','续航不足'],
+    axisLine:{lineStyle:{color:'#d2d2d7'}},axisLabel:{color:'#1d1d1f',fontSize:12,...FONT}},
+  series:[{type:'bar',
+    data:[{value:38,itemStyle:{color:'#0071e3'}},{value:42,itemStyle:{color:'#0071e3'}},{value:47,itemStyle:{color:'#d97706'}},
+      {value:54,itemStyle:{color:'#d97706'}},{value:58,itemStyle:{color:'#d97706'}},{value:63,itemStyle:{color:'#e02424'}},
+      {value:67,itemStyle:{color:'#e02424'}},{value:72,itemStyle:{color:'#e02424'}}],
+    barWidth:'55%',label:{show:true,position:'right',formatter:'{c}%',color:'#1d1d1f',fontSize:12,...FONT}
+  }]
+});
+
+// 图4-2 人群×痛点热力矩阵
+const PAINS=['续航不足','夜间佩戴不适','有数据无行动','操作复杂/字小','医疗级精度不足','AI不够智能','跨平台数据不互通','隐私安全担忧'];
+const PERSONAS=['运动健身','睡眠关注','银发慢病','商务差旅','儿童家长'];
+// 强度: 0=无 1=弱 2=中 3=强  [painIdx, personaIdx, value]
+const heatData=[];
+const M={
+ '运动健身':[2,1,1,1,2,1,2,0],
+ '睡眠关注':[2,3,3,1,2,2,1,1],
+ '银发慢病':[2,1,3,3,3,2,3,2],
+ '商务差旅':[3,1,1,1,1,3,2,2],
+ '儿童家长':[1,1,1,2,1,1,3,2]
+};
+PERSONAS.forEach((p,yi)=>{M[p].forEach((v,xi)=>{heatData.push([xi,yi,v])})});
+echarts.init(document.getElementById('chart-heat')).setOption({
+  grid:{left:'14%',right:'6%',top:'6%',bottom:'18%'},
+  tooltip:{position:'top',formatter:function(pt){const lvl=['','弱','中','强'];return PERSONAS[pt.data[1]]+' · '+PAINS[pt.data[0]]+'<br/>影响强度：'+lvl[pt.data[2]]}},
+  xAxis:{type:'category',data:PAINS,splitArea:{show:true},axisLabel:{color:'#1d1d1f',fontSize:11,...FONT,interval:0,rotate:32},axisLine:{lineStyle:{color:'#d2d2d7'}}},
+  yAxis:{type:'category',data:PERSONAS,splitArea:{show:true},axisLabel:{color:'#1d1d1f',fontSize:12,...FONT},axisLine:{lineStyle:{color:'#d2d2d7'}}},
+  visualMap:{min:0,max:3,calculable:false,orient:'horizontal',left:'center',bottom:'0%',itemWidth:14,itemHeight:90,
+    text:['强','弱'],textStyle:{...FONT,color:'#6e6e73'},
+    inRange:{color:['#eef4fb','#9cc6f5','#2997ff','#00468c']}},
+  series:[{type:'heatmap',data:heatData,label:{show:true,formatter:function(p){return ['','●','●●','●●●'][p.data[2]]},color:'#fff',fontSize:11},
+    itemStyle:{borderColor:'#fff',borderWidth:3,borderRadius:6},
+    emphasis:{itemStyle:{shadowBlur:10,shadowColor:'rgba(0,0,0,.2)'}}}]
+});
+
+// 图5-1 机会
+echarts.init(document.getElementById('chart-opportunity')).setOption({
+  color:['#0071e3'],
+  grid:{left:'10%',right:'8%',bottom:'14%',top:'10%'},
+  xAxis:{name:'市场机会规模 →',type:'value',min:0,max:100,nameLocation:'middle',nameGap:30,
+    nameTextStyle:{...FONT,color:'#6e6e73'},axisLine:{lineStyle:{color:'#d2d2d7'}},splitLine:{lineStyle:{color:'#f5f5f7'}},axisLabel:{color:'#86868b'}},
+  yAxis:{name:'紧迫度 →',type:'value',min:0,max:100,nameLocation:'middle',nameGap:38,
+    nameTextStyle:{...FONT,color:'#6e6e73'},axisLine:{lineStyle:{color:'#d2d2d7'}},splitLine:{lineStyle:{color:'#f5f5f7'}},axisLabel:{color:'#86868b'}},
+  tooltip:{trigger:'item',formatter:function(p){return p.data.name+'<br/>规模:'+p.data.value[0]+'<br/>紧迫度:'+p.data.value[1]}},
+  series:[{type:'scatter',symbolSize:28,
+    data:[{name:'数据→行动闭环',value:[88,92]},{name:'医疗级精测',value:[95,85]},{name:'长续航无感',value:[70,88]},
+      {name:'AI主动服务',value:[75,72]},{name:'银发慢病管理',value:[90,80]},{name:'B端保险联动',value:[85,60]},
+      {name:'AI眼镜刚需',value:[78,70]},{name:'跨平台互通',value:[65,55]},{name:'隐私数据主权',value:[55,50]}],
+    label:{show:true,formatter:function(p){return p.data.name},position:'top',color:'#1d1d1f',fontSize:11,...FONT}
+  }]
+});
+
+// 图6-1 气泡图
+echarts.init(document.getElementById('chart-bubble')).setOption({
+  color:['#0071e3','#e02424','#d97706','#86868b','#059669'],
+  grid:{left:'10%',right:'8%',bottom:'14%',top:'10%'},
+  xAxis:{name:'技术可行性 →',type:'value',min:0,max:10,nameLocation:'middle',nameGap:30,
+    nameTextStyle:{...FONT,color:'#6e6e73'},axisLine:{lineStyle:{color:'#d2d2d7'}},splitLine:{lineStyle:{color:'#f5f5f7'}},axisLabel:{color:'#86868b'}},
+  yAxis:{name:'用户价值度 →',type:'value',min:0,max:10,nameLocation:'middle',nameGap:38,
+    nameTextStyle:{...FONT,color:'#6e6e73'},axisLine:{lineStyle:{color:'#d2d2d7'}},splitLine:{lineStyle:{color:'#f5f5f7'}},axisLabel:{color:'#86868b'}},
+  tooltip:{trigger:'item',formatter:function(p){return p.data.name+'<br/>可行性:'+p.data.value[0]+'<br/>用户价值:'+p.data.value[1]+'<br/>AI赋能增量:'+p.data.value[2]}},
+  series:[{type:'scatter',symbolSize:function(data){return data[2]*6},
+    data:[{name:'数据行动闭环',value:[8,9.5,4.8]},{name:'医疗级精测预警',value:[8,9,4.5]},{name:'长续航无感',value:[7,8,4.0]},
+      {name:'跨设备互通',value:[5,7,3.5]},{name:'AI原生交互',value:[5,6.5,3.2]}],
+    label:{show:true,formatter:function(p){return p.data.name},position:'right',color:'#1d1d1f',fontSize:12,...FONT}
+  }]
+});
+
+// 图7-1 AI创新可行性评估
+echarts.init(document.getElementById('chart-ai-hypo')).setOption({
+  color:['#0071e3','#e02424','#d97706','#86868b','#059669'],
+  grid:{left:'10%',right:'8%',bottom:'14%',top:'10%'},
+  xAxis:{name:'技术可行性 →',type:'value',min:0,max:10,nameLocation:'middle',nameGap:30,
+    nameTextStyle:{...FONT,color:'#6e6e73'},axisLine:{lineStyle:{color:'#d2d2d7'}},splitLine:{lineStyle:{color:'#f5f5f7'}},axisLabel:{color:'#86868b'}},
+  yAxis:{name:'商业可行性 →',type:'value',min:0,max:10,nameLocation:'middle',nameGap:38,
+    nameTextStyle:{...FONT,color:'#6e6e73'},axisLine:{lineStyle:{color:'#d2d2d7'}},splitLine:{lineStyle:{color:'#f5f5f7'}},axisLabel:{color:'#86868b'}},
+  tooltip:{trigger:'item',formatter:function(p){return p.data.name+'<br/>技术可行性:'+p.data.value[0]+'<br/>商业可行性:'+p.data.value[1]}},
+  series:[{type:'scatter',symbolSize:28,
+    data:[{name:'01 健康洞察引擎',value:[9,8]},{name:'02 主动预警干预',value:[9,9.5]},
+      {name:'03 场景化交互',value:[7,8]},{name:'04 多设备协同',value:[5,5]},{name:'05 AI原生形态',value:[3,5]}],
+    label:{show:true,formatter:function(p){return p.data.name},position:'top',color:'#1d1d1f',fontSize:12,...FONT}
+  }]
+});
+
+// 滚动揭示动画
+(function(){
+  if(!('IntersectionObserver' in window)){document.querySelectorAll('.reveal').forEach(e=>e.classList.add('in'));return;}
+  const io=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target);}})},{threshold:.08});
+  document.querySelectorAll('.reveal').forEach(e=>io.observe(e));
+})();
+
+// 返回顶部
+(function(){
+  const btn=document.getElementById('totop');
+  window.addEventListener('scroll',()=>{btn.classList.toggle('show',window.scrollY>600);});
+  btn.addEventListener('click',()=>window.scrollTo({top:0,behavior:'smooth'}));
+})();
+
+// 目录高亮
+(function(){
+  const links=[...document.querySelectorAll('.toc-item')];
+  const map={};links.forEach(l=>{const id=l.getAttribute('href').slice(1);map[id]=l;});
+  const so=new IntersectionObserver((es)=>{es.forEach(e=>{if(e.isIntersecting){links.forEach(l=>l.classList.remove('active'));if(map[e.target.id])map[e.target.id].classList.add('active');}});},{rootMargin:'-45% 0px -50% 0px'});
+  document.querySelectorAll('section[id]').forEach(s=>so.observe(s));
+})();
+
+// 响应式重绘
+window.addEventListener('resize',()=>{document.querySelectorAll('.chart').forEach(c=>{const inst=echarts.getInstanceByDom(c);if(inst)inst.resize();});});
+</script>
+</body>
+</html>
