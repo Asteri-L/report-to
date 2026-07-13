@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>产品需求文档 · PRD 合集</title>
+<style>
+:root{
+  --bg:#ffffff; --bg-soft:#f4f8fd; --text:#1f1f22; --text-2:#56565c; --text-3:#8a8a90;
+  --line:#e4e9f0; --blue:#0071e3; --blue-soft:#eaf2fe; --blue-ink:#0a5bc4;
+  --green:#1a7f37; --radius:16px; --maxw:840px;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+::selection{background:rgba(0,113,227,.16);color:#062b5e}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Helvetica Neue",Helvetica,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+  font-size:16.5px; line-height:1.8; color:var(--text); background:var(--bg);
+  -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility;
+  font-feature-settings:"kern" 1; letter-spacing:.005em;
+}
+.nav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,.78);
+  backdrop-filter:saturate(180%) blur(20px);-webkit-backdrop-filter:saturate(180%) blur(20px);
+  border-bottom:1px solid rgba(0,113,227,.14);}
+.nav-inner{max-width:1080px;margin:0 auto;padding:0 22px;height:56px;display:flex;
+  align-items:center;justify-content:space-between;gap:16px;}
+.brand{display:flex;align-items:center;gap:11px;font-weight:600;font-size:15px;white-space:nowrap}
+.brand .dot{width:22px;height:22px;border-radius:7px;
+  background:linear-gradient(135deg,#0a84ff,#0066d6);box-shadow:0 2px 6px rgba(0,113,227,.35)}
+.tabs{display:flex;gap:5px;background:var(--bg-soft);padding:4px;border-radius:13px;overflow-x:auto}
+.tab{border:none;background:transparent;font:inherit;font-size:14px;color:var(--text-3);
+  padding:7px 16px;border-radius:10px;cursor:pointer;transition:all .25s ease;white-space:nowrap}
+.tab:hover{color:var(--blue)}
+.tab.active{background:#fff;color:var(--blue);box-shadow:0 1px 4px rgba(0,113,227,.18);font-weight:600}
+.panel{display:none}
+.panel.active{display:block;animation:fade .45s ease}
+@keyframes fade{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.container{max-width:var(--maxw);margin:0 auto;padding:0 24px 110px}
+.hero{padding:88px 0 46px;text-align:center;position:relative}
+.hero::before{content:"";position:absolute;top:-30px;left:50%;transform:translateX(-50%);
+  width:460px;height:260px;background:radial-gradient(ellipse at center,rgba(0,113,227,.10),transparent 70%);
+  filter:blur(8px);z-index:-1;pointer-events:none}
+.hero h1{font-size:46px;line-height:1.16;font-weight:700;letter-spacing:-.025em;
+  background:linear-gradient(115deg,#1d1d1f 38%,#0071e3);-webkit-background-clip:text;
+  background-clip:text;color:transparent}
+.pills{display:flex;gap:9px;justify-content:center;flex-wrap:wrap;margin-top:20px}
+.pill{font-size:12.5px;color:var(--text-2);background:var(--bg-soft);border:1px solid var(--line);
+  padding:6px 14px;border-radius:999px;transition:transform .2s ease}
+.pill:hover{transform:translateY(-1px)}
+.pill.status{color:#147a30;background:#eafaf0;border-color:#bfe9cd}
+h2{font-size:25px;font-weight:700;letter-spacing:-.01em;margin:62px 0 18px;padding-left:15px;
+  border-left:4px solid var(--blue);line-height:1.35;color:#161618}
+h3{font-size:19px;font-weight:600;margin:34px 0 12px;color:#1d1d1f}
+h4{font-size:15.5px;font-weight:600;margin:22px 0 9px;color:var(--blue-ink)}
+p{margin:15px 0;color:var(--text-2)}
+strong{font-weight:600;color:#161618}
+em{color:var(--blue-ink);font-style:normal;font-weight:500}
+hr{border:none;border-top:1px solid var(--line);margin:46px 0}
+code{font-family:"SF Mono",ui-monospace,Menlo,Consolas,monospace;background:var(--blue-soft);
+  padding:2px 7px;border-radius:6px;font-size:12.5px;color:var(--blue-ink)}
+.table-wrap{margin:20px 0;overflow-x:auto;border:1px solid var(--line);
+  border-radius:var(--radius);background:#fff;box-shadow:0 1px 3px rgba(0,113,227,.05)}
+table{width:100%;border-collapse:collapse;font-size:14px;min-width:540px}
+thead th{background:var(--blue-soft);text-align:left;font-weight:600;color:var(--blue-ink);
+  padding:14px 17px;border-bottom:1px solid var(--line);white-space:nowrap;letter-spacing:.01em}
+tbody td{padding:13px 17px;border-bottom:1px solid #eef1f5;color:var(--text);vertical-align:top}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:#f7faff}
+@media(max-width:640px){
+  body{font-size:15.5px}
+  .hero{padding:58px 0 32px}
+  .hero h1{font-size:31px}
+  h2{font-size:21px;margin:46px 0 15px;padding-left:12px}
+  h3{font-size:17.5px}
+  .nav-inner{height:auto;padding:10px 16px;flex-direction:column;gap:10px}
+  .container{padding:0 16px 80px}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <div class="nav-inner">
+    <div class="brand"><span class="dot"></span>PRD 文档中心</div>
+    <nav class="tabs"><button class="tab active" data-target="doc1">AI 健康管理助手</button><button class="tab" data-target="doc2">智能耳夹硬件</button></nav>
+  </div>
+</header>
+<main>
+<section class="panel active" id="doc1"><div class="container"><div class="hero">
+<h1>AI 健康管理助手 --- 产品需求文档（PRD）</h1>
+<div class="pills"><span class="pill">版本：v5.0</span><span class="pill">2026-07-12</span><span class="pill status">状态：已审核通过</span><span class="pill">产品形态：iOS / Android App（可选配智能耳夹硬件）</span></div>
+</div>
+<hr>
+<h2>1. 执行摘要</h2>
+<p>AI 健康管理助手是一款面向全年龄段用户的健康管理 App，同时为男性和女性提供深度健康管理。核心差异化在于两层设计：</p>
+<p>第一，Agent 主动推理层。通过基本档案到每日建议四步闭环，结合可穿戴设备数据、天气 API、体检报告解析，提供个性化健康管理。</p>
+<p>第二，Agent 实体化为橡皮糖形态的电子宠物，可悬浮附着在首页任意组件上，根据上下文自动移动到需关注的模块上方，支持点击对话和长按语音。</p>
+<p>产品内置运动记录功能，涵盖 50+ 运动类型、GPS 轨迹追踪、实时心率区间、运动后恢复分析。同时支持接入 Apple Health / Garmin 等平台补充数据。</p>
+<p>首期覆盖六个通用模块（睡眠管理、心率管理、压力管理、体温管理、运动管理、补剂管理）以及两套深度管理模块（女性健康、男性健康）。所有指标按性别和年龄自动配置。</p>
+<hr>
+<h2>2. 产品定位</h2>
+<h3>2.1 一句话定位</h3>
+<p>一个会主动管理你健康的 AI 电子宠物。不是让你看数据的仪表板，而是替你记住该做什么的伙伴。</p>
+<h3>2.2 不是什么</h3>
+<div class="table-wrap"><table><thead><tr><th>不是</th><th>说明</th></tr></thead><tbody><tr><td>不是 AI 问答机器人</td><td>不追求你问我答，而是主动推算、主动提醒、主动管理</td></tr><tr><td>不是纯运动追踪 App</td><td>运动记录是基础能力，不堆砌运动数据功能</td></tr><tr><td>不是女性专用 App</td><td>女性和男性的深度健康管理同等投入</td></tr><tr><td>不是医疗诊断工具</td><td>所有建议仅供参考，不做疾病诊断</td></tr></tbody></table></div>
+<h3>2.3 为什么是我们</h3>
+<div class="table-wrap"><table><thead><tr><th>市场机会</th><th>产品方案</th></tr></thead><tbody><tr><td>用户每天收到大量健康数据但不知道该怎么办</td><td>Agent 主动给出每日 1-3 条关键建议</td></tr><tr><td>女性健康需求（周期/备孕/更年期）被穿戴设备忽视</td><td>女性专属 6 项深度指标，按年龄自动配置</td></tr><tr><td>男性健康需求（呼吸暂停/前列腺/HRV 衰退）无人覆盖</td><td>男性专属 5 项深度指标，40 岁+自动开启</td></tr><tr><td>健康 App 交互冰冷，难以坚持</td><td>橡皮糖电子宠物，会移动、有情绪、主动找你</td></tr></tbody></table></div>
+<hr>
+<h2>3. 需求分析</h2>
+<h3>3.1 问题背景</h3>
+<p>可穿戴健康管理市场存在四个结构性缺口：</p>
+<p>缺口一：数据有了，但洞察没有。用户每天收到几十个数字，但绝大多数 App 无法回答这些数字意味着什么。少数竞品（Whoop Coach、Oura Advisor）开始提供 AI 数据问答，但均为被动模式（用户提问 -> AI 回复），而非主动推送和管理。</p>
+<p>缺口二：设备默认用户是男性。女性的周期波动、围绝经期变化在算法层面被忽略。同时男性的睡眠呼吸暂停、前列腺早期信号等也未得到深度覆盖。</p>
+<p>缺口三：健康管理需要主动行为。用户需要的是"你记得提醒我"，而不是"等你打开才看到"。</p>
+<p>缺口四：健康 App 缺乏情感温度。一个会主动来找你的电子宠物，比冰冷的数据面板更能帮助用户坚持。</p>
+<h3>3.2 目标用户</h3>
+<div class="table-wrap"><table><thead><tr><th>用户群体</th><th>核心痛点</th><th>产品侧重点</th></tr></thead><tbody><tr><td>25-40 岁职场女性</td><td>周期与压力叠加，找不到关联规律</td><td>周期追踪 + PMS 预警 + 压力管理</td></tr><tr><td>40-55 岁围绝经期女性</td><td>潮热、睡眠紊乱，缺乏量化工具</td><td>潮热检测 + 更年期综合管理</td></tr><tr><td>35-50 岁男性</td><td>睡眠呼吸暂停高风险、忽视身体疲劳</td><td>AHI 筛查 + HRV 衰退曲线</td></tr><tr><td>18-35 岁运动人群</td><td>过度训练、恢复不足、补剂混乱</td><td>运动记录 + 运动疲劳管理 + 补剂管理</td></tr><tr><td>备孕期女性</td><td>排卵预测不准、补剂管理</td><td>备孕模式 + 易孕期预测 + 叶酸提醒</td></tr><tr><td>50 岁+男性</td><td>夜起增多、心血管风险上升</td><td>夜间起夜趋势 + 心血管指标追踪</td></tr></tbody></table></div>
+<h3>3.3 用户画像与首页组件数</h3>
+<p>通用 19 项 = 睡眠(4) + 心率(3) + 体温(1) + 压力(3) + 运动(5) + 补剂(3)</p>
+<div class="table-wrap"><table><thead><tr><th>画像</th><th>通用</th><th>女专</th><th>男专</th><th>总计</th></tr></thead><tbody><tr><td>女 14-25</td><td>19</td><td>3</td><td>-</td><td>22</td></tr><tr><td>女 25-40</td><td>19</td><td>4</td><td>-</td><td>23</td></tr><tr><td>女 40-50</td><td>19</td><td>4</td><td>-</td><td>23</td></tr><tr><td>女 50-60</td><td>19</td><td>2</td><td>-</td><td>21</td></tr><tr><td>女 60+</td><td>19</td><td>0</td><td>-</td><td>19</td></tr><tr><td>男 18-35</td><td>19</td><td>-</td><td>2</td><td>21</td></tr><tr><td>男 35-50</td><td>19</td><td>-</td><td>5</td><td>24</td></tr><tr><td>男 50+</td><td>19</td><td>-</td><td>4</td><td>23</td></tr></tbody></table></div>
+<h3>3.4 用户场景</h3>
+<p><strong>场景一：晨间简报（v1.2+）</strong> 早上 7:30。橡皮糖蹲在简报卡片上："昨晚睡了 7.2h，恢复评分 82。今天卵泡期后期，适合力量训练。室外 26C，补水 1.8L。铁剂该吃了。"</p>
+<p><strong>场景二：补剂催促（v1.3+）</strong> 下午 3 点补剂未确认。用户打开 App，橡皮糖已跳到补剂卡片上快速弹跳。确认服用后橡皮糖跳回默认位变开心表情。</p>
+<p><strong>场景三：HRV 下降预警（v1.2+）</strong> 橡皮糖蹲在心率管理卡片上，颜色暖橙。点开看到："HRV 连续 3 天下降 22%，建议完全休息。运动强度已自动下调。"</p>
+<p><strong>场景四：运动记录（v1.4+）</strong> 选择户外跑步。GPS 追踪轨迹，心率实时显示。结束后 Agent 推送：恢复评分 78，建议补蛋白。</p>
+<p><strong>场景五：语音对话（v2.0+）</strong> 长按橡皮糖问"今天状态怎么样"，Agent 语音回复。此功能在 Phase 2 上线。</p>
+<hr>
+<h2>4. 竞品分析</h2>
+<h3>4.1 竞品 AI 功能现状</h3>
+<div class="table-wrap"><table><thead><tr><th>产品</th><th>AI 形态</th><th>主动/被动</th></tr></thead><tbody><tr><td>Whoop Coach（2024）</td><td>文字聊天问答</td><td>被动（用户提问）</td></tr><tr><td>Oura Advisor（2024）</td><td>文字聊天问答</td><td>被动（用户提问）</td></tr><tr><td>Zepp Aura（2023）</td><td>内容推荐+对话</td><td>半主动</td></tr><tr><td>Fitbit AI / Fitbit Labs（2024）</td><td>文字聊天问答</td><td>被动（用户提问）</td></tr><tr><td>Apple Health</td><td>无</td><td>-</td></tr><tr><td><strong>本产品</strong></td><td><strong>橡皮糖实体化 + 浮动附着</strong></td><td><strong>主动（自动推算+建议+提醒）</strong></td></tr></tbody></table></div>
+<h3>4.2 核心差异</h3>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>竞品 AI</th><th>本产品</th></tr></thead><tbody><tr><td>交互入口</td><td>固定在聊天窗口</td><td>实体化橡皮糖，浮动在界面组件上</td></tr><tr><td>触发方式</td><td>用户提问 -> AI 回答</td><td>自动推算 -> 主动推送并附着到对应模块</td></tr><tr><td>信息呈现</td><td>纯文本对话</td><td>位置即信息——蹲在哪个模块上，用户就知道哪里有问题</td></tr><tr><td>交互通道</td><td>仅文字</td><td>点击对话 + 长按语音 + 视觉位置暗示</td></tr><tr><td>情绪反馈</td><td>无</td><td>9 种橡皮糖状态</td></tr><tr><td>建议范围</td><td>限于用户提问</td><td>主动管理：催促、降级、预警</td></tr></tbody></table></div>
+<h3>4.3 功能矩阵</h3>
+<div class="table-wrap"><table><thead><tr><th>功能</th><th>本产品</th><th>Apple Health</th><th>Oura</th><th>Whoop</th><th>Keep</th><th>Zepp</th></tr></thead><tbody><tr><td>AI 能力</td><td>主动电子宠物</td><td>无</td><td>被动问答</td><td>被动问答</td><td>无</td><td>半主动</td></tr><tr><td>女性健康</td><td>周期+备孕+潮热+更年期</td><td>基础记录</td><td>周期+排卵</td><td>周期感知</td><td>无</td><td>基础</td></tr><tr><td>男性健康</td><td>呼吸+鼾声+夜起+HRV衰退</td><td>无</td><td>无</td><td>HRV 恢复</td><td>无</td><td>无</td></tr><tr><td>体检报告解析</td><td>有</td><td>无</td><td>无</td><td>无</td><td>无</td><td>无</td></tr><tr><td>补剂管理</td><td>内置</td><td>无</td><td>无</td><td>无</td><td>无</td><td>无</td></tr><tr><td>运动记录</td><td>50+类型+GPS</td><td>有</td><td>基础</td><td>基础</td><td>专业</td><td>有</td></tr><tr><td>天气融合</td><td>有</td><td>无</td><td>无</td><td>无</td><td>无</td><td>无</td></tr><tr><td>年龄/性别自适应</td><td>核心设计</td><td>无</td><td>无</td><td>无</td><td>无</td><td>无</td></tr><tr><td>橡皮糖实体化</td><td>独有</td><td>无</td><td>无</td><td>无</td><td>无</td><td>无</td></tr></tbody></table></div>
+<h3>4.4 策略选择</h3>
+<p>1. 不做问答式 AI。方向是主动管理 + 实体化交互。 2. 不做纯运动 App。运动记录是基础能力。 3. 女性和男性健康同等投入。 4. 补剂管理 + 体检报告解析是本产品独有的功能组合。 5. 不是技术领先，而是交互范式领先——规则引擎做确定性推理，橡皮糖做情感连接。</p>
+<hr>
+<h2>5. 产品设计</h2>
+<h3>5.1 页面结构</h3>
+<p>详情参考 Demo。以下为功能层级概要：</p>
+<div class="table-wrap"><table><thead><tr><th>一级页面</th><th>说明</th></tr></thead><tbody><tr><td>首页</td><td>橡皮糖 + 每日简报 + 管理模块卡片网格。卡片按性别/年龄自动排列</td></tr><tr><td>运动记录</td><td>运动类型选择、实时追踪、历史记录</td></tr><tr><td>健康档案</td><td>用户画像、体检报告、补剂配置</td></tr><tr><td>数据趋势</td><td>周/月/年趋势、指标对比、周期日历</td></tr><tr><td>设置</td><td>橡皮糖偏好、提醒开关、通知时段</td></tr></tbody></table></div>
+<h3>5.2 核心功能汇总</h3>
+<div class="table-wrap"><table><thead><tr><th>功能模块</th><th>内容</th><th>交付版本</th></tr></thead><tbody><tr><td>基本档案</td><td>性别/年龄/身高/体重 + 问卷 + 体检报告上传解析</td><td>v1.0</td></tr><tr><td>目标选择</td><td>从 8 个健康方向中选择 1-3 个目标</td><td>v1.0</td></tr><tr><td>每日简报</td><td>基于睡眠+天气+周期+恢复的综合推理建议</td><td>v1.2</td></tr><tr><td>补剂管理</td><td>添加、定时提醒、服用记录、自适应调整</td><td>v1.3</td></tr><tr><td>运动记录</td><td>GPS 追踪、50+ 运动类型、心率区间、运动报告</td><td>v1.4（基础）/ v3.2（完整）</td></tr><tr><td>女性健康</td><td>生理周期、基础体温、排卵预测、PMS、潮热、更年期</td><td>v1.5</td></tr><tr><td>压力管理</td><td>HRV+HR+呼吸综合压力评估</td><td>v2.0</td></tr><tr><td>男性健康</td><td>呼吸质量、鼾声检测、夜起追踪、HRV 衰退曲线</td><td>v2.1</td></tr><tr><td>运动疲劳</td><td>过度训练预警。男女通用，女性含周期校正</td><td>v1.x 基础 / v2.1 算法</td></tr><tr><td>体温管理</td><td>体表温度、基础体温（女）、潮热记录（女）</td><td>v2.3</td></tr><tr><td>语音对话</td><td>长按唤醒、松手发送、TTS 回复</td><td>v2.0</td></tr><tr><td>天气融合</td><td>穿衣/补水建议联动天气 API</td><td>v2.4</td></tr><tr><td>训练计划</td><td>Agent 根据恢复评分和周期推荐训练</td><td>v3.2</td></tr><tr><td>智能耳夹</td><td>硬件联动、数据同步、OTA 升级</td><td>v3.0</td></tr></tbody></table></div>
+<h3>5.3 橡皮糖电子宠物（核心交互概念）</h3>
+<p>Agent 不是固定图标，而是可自由活动的电子宠物。它根据当前状态选择合适组件"蹲"在上面，用户打开 App 一眼就能看到哪里需要关注。</p>
+<div class="table-wrap"><table><thead><tr><th>传统 App</th><th>本产品</th></tr></thead><tbody><tr><td>小红点/角标</td><td>橡皮糖直接跳到模块上蹲着</td></tr><tr><td>先看通知再找模块</td><td>打开 App 一眼看到哪里有异常</td></tr><tr><td>Agent 固定位置</td><td>自由附着，与界面融合</td></tr><tr><td>交互是事务性的</td><td>有温度的交互：它来找你，你点它</td></tr></tbody></table></div>
+<p>交互方式：点击进入文字对话界面，长按触发语音对话（v2.0）。橡皮糖有 9 种状态（待机/有话说/担心/开心等），不同状态对应不同颜色和动画表现。具体设计细节参考 Demo。</p>
+<h3>5.4 各模块功能说明</h3>
+<p>各管理模块的组件设计、数据来源、展示形态等详情参考 Demo。以下为各模块的功能范围：</p>
+<div class="table-wrap"><table><thead><tr><th>模块</th><th>功能范围</th><th>交付</th></tr></thead><tbody><tr><td>睡眠管理</td><td>睡眠时长、深睡质量、夜醒次数、入睡速度</td><td>v1.2</td></tr><tr><td>心率管理</td><td>心率、HRV（身体恢复力）、血氧</td><td>v1.2</td></tr><tr><td>压力管理</td><td>综合压力评估、紧张反应、呼吸频率</td><td>v2.0</td></tr><tr><td>体温管理</td><td>体表温度、基础体温（女）、潮热记录（女）</td><td>v2.3</td></tr><tr><td>运动管理</td><td>活动量、恢复评分、心肺恢复、今日训练入口、运动疲劳</td><td>v1.4~v2.2</td></tr><tr><td>补剂管理</td><td>添加补剂、定时提醒、服用记录、自适应调整、交互提醒</td><td>v1.3</td></tr><tr><td>女性健康</td><td>生理周期、基础体温、易孕期、经前状态、潮热、更年期</td><td>v1.5</td></tr><tr><td>男性健康</td><td>呼吸质量、夜间鼾声、夜间起夜、HRV 身体趋势、噪音防护</td><td>v2.1</td></tr></tbody></table></div>
+<h3>5.5 用户故事</h3>
+<p><strong>US-01 基本档案注册</strong> As a 新用户，I want to 输入性别/年龄/基础健康信息，So that Agent 能设置正确的监测指标和基线。 验收条件：必填性别/年龄/身高/体重；可选 5 题健康问卷；可选上传体检报告（AI 即时解析）；完成后 Agent 开始个性化配置。</p>
+<p><strong>US-02 每日简报推送</strong> As a 活跃用户，I want to 每天早上收到 Agent 生成的简短健康简报，So that 我不自己分析数据就知道今天注意什么。 验收条件：清晨推送（6:00-8:00）；融合睡眠+天气+周期+恢复评分；显示 1-3 条建议；打开率 > 65%。</p>
+<p><strong>US-03 补剂提醒与确认</strong> As a 有补剂需求的用户，I want to 设置补剂时间和剂量到点收到提醒，So that 我不会忘记吃。 验收条件：可添加补剂（名称/剂量/时间/服用方式）；到点推送；点击即确认（无需打开 App）；连续 3 次确认后减频率；连续 3 次忽略后主动询问调时间；日历视图记录。</p>
+<p><strong>US-04 运动记录</strong> As a 运动用户，I want to 通过 App 记录运动，So that 能追踪运动数据和恢复状态。 验收条件：支持 5+ 种运动类型（v1.4）/ 50+ 种（v3.2）；GPS 记录轨迹；实时心率区间；运动后报告；Agent 恢复建议。</p>
+<p><strong>US-05 女性周期追踪</strong> As a 女性用户，I want to 查看生理周期阶段和基础体温，So that 了解周期规律和排卵窗口。 验收条件：自动识别周期阶段；显示 BBT 曲线并标注阶段；备孕模式显示排卵预测；PMS 预警。</p>
+<p><strong>US-06 男性呼吸质量筛查</strong> As a 35 岁+男性用户，I want to 查看夜间呼吸质量评估，So that 了解睡眠呼吸暂停风险。 验收条件：AHI 估算值；分级标签（正常/轻度/中度/重度）；打鼾时长强度；40 岁+额外显示夜起趋势。</p>
+<p><strong>US-07 Agent 异常预警</strong> As a 用户，I want to 指标偏离基线时收到 Agent 主动预警，So that 及时关注身体变化。 验收条件：HRV 连续 3 天下降 > 15% 触发；静息心率连续 3 天上升 > 5bpm 触发；橡皮糖自动移动到对应模块转为担心状态。</p>
+<p><strong>US-08 运动疲劳预警</strong> As a 运动用户，I want to Agent 根据恢复状态建议训练强度，So that 不会过度训练。 验收条件：综合 HRV/静息心率/深睡判断；恢复不足时显示预警；含具体数据和建议；女性自动扣除周期影响。</p>
+<p><strong>US-09 语音交互（v2.0）</strong> As a 忙碌的用户，I want to 长按橡皮糖用语音提问，So that 不需要打字。 验收条件：长按 350ms 收音；松手发送；TTS 回复；23:00-7:00 切换文字模式。</p>
+<h3>5.6 首次启动流程</h3>
+<p>三步设置：基本档案（性别/年龄/身高/体重/问卷 + 可选上传体检报告）-> 目标选择（8 个方向选 1-3 个）-> 数据接入（Apple Health / Google Fit 或跳过）。次日早上 Agent 送出第一条简报。</p>
+<hr>
+<h2>6. 数据埋点方案</h2>
+<h3>6.1 北极星指标</h3>
+<p>用户主动健康行为频次（次/周）= 确认补剂 + 打开简报 + 查看模块详情 + 采纳建议 + 主动记录运动 + 与 Agent 对话</p>
+<h3>6.2 指标体系</h3>
+<div class="table-wrap"><table><thead><tr><th>层级</th><th>指标</th><th>正式目标</th><th>MVP 通过条件</th></tr></thead><tbody><tr><td>北极星</td><td>主动健康行为频次</td><td>> 35 次/周</td><td>> 20 次/周</td></tr><tr><td>一级</td><td>简报打开率</td><td>> 65%</td><td>> 65%</td></tr><tr><td>一级</td><td>橡皮糖日点击率</td><td>> 50%</td><td>> 40%</td></tr><tr><td>一级</td><td>建议采纳率</td><td>> 40%</td><td>> 30%</td></tr><tr><td>二级</td><td>D7 留存</td><td>> 30%</td><td>> 25%</td></tr><tr><td>二级</td><td>D30 留存</td><td>> 20%</td><td>-</td></tr><tr><td>二级</td><td>Agent 正向反馈率</td><td>> 80%</td><td>> 70%</td></tr><tr><td>二级</td><td>补剂服用率</td><td>> 70%</td><td>> 50%</td></tr><tr><td>二级</td><td>运动记录周使用率</td><td>> 35%</td><td>> 20%</td></tr></tbody></table></div>
+<h3>6.3 核心事件</h3>
+<div class="table-wrap"><table><thead><tr><th>类别</th><th>事件</th><th>用途</th></tr></thead><tbody><tr><td>用户获取</td><td>register_completed / onboarding_step_1-3_completed / health_report_uploaded / device_connected</td><td>注册转化率</td></tr><tr><td>用户参与</td><td>daily_briefing_opened / module_card_tapped / gummy_tapped / gummy_long_pressed</td><td>互动率</td></tr><tr><td>运动记录</td><td>workout_started / workout_completed / workout_abandoned</td><td>运动参与</td></tr><tr><td>补剂管理</td><td>supplement_added / supplement_taken / supplement_reminder_ignored</td><td>补剂使用</td></tr><tr><td>Agent 效果</td><td>gummy_moved_to_card / gummy_tapped_on_card / advice_taken / advice_positive_feedback</td><td>浮动提醒转化</td></tr></tbody></table></div>
+<h3>6.4 产品健康 Dashboard</h3>
+<div class="table-wrap"><table><thead><tr><th>看板</th><th>指标</th><th>频率</th></tr></thead><tbody><tr><td>用户增长</td><td>安装量、注册量、渠道归因</td><td>每日</td></tr><tr><td>Agent 有效性</td><td>简报打开率、建议采纳率、正向反馈率</td><td>每日</td></tr><tr><td>橡皮糖互动</td><td>日点击率、语音使用率、浮动提醒转化率</td><td>每日</td></tr><tr><td>运动参与</td><td>周运动记录率、运动完成率</td><td>每周</td></tr><tr><td>补剂健康</td><td>补剂配置率、服用率</td><td>每周</td></tr><tr><td>留存曲线</td><td>D1 / D7 / D14 / D30</td><td>每月</td></tr></tbody></table></div>
+<hr>
+<h2>7. 迭代规划</h2>
+<h3>7.1 总体策略</h3>
+<p>三阶段 + 双周迭代。第 1 周开发，第 2 周测试+发布。</p>
+<h3>7.2 Phase 1：MVP（第 1-12 周）</h3>
+<p>目标：验证核心闭环（档案 -> 简报 -> 补剂 -> 基础运动 -> 橡皮糖交互）</p>
+<div class="table-wrap"><table><thead><tr><th>迭代</th><th>核心交付</th><th>橡皮糖功能</th><th>验证指标</th></tr></thead><tbody><tr><td>v1.0</td><td>基本档案 + 目标选择</td><td>-</td><td>注册转化率 > 60%</td></tr><tr><td>v1.1</td><td>体检报告上传 + AI 解析</td><td>-</td><td>上传率 > 30%</td></tr><tr><td>v1.2</td><td>每日简报 + 规则引擎 + Apple Health 接入</td><td>基础动画</td><td>简报打开率 > 65%</td></tr><tr><td>v1.3</td><td>补剂管理</td><td>弹跳提醒</td><td>补剂添加率 > 40%</td></tr><tr><td>v1.4</td><td>运动记录 v1（GPS + 5 种运动）</td><td>浮动附着</td><td>运动周使用率 > 20%</td></tr><tr><td>v1.5</td><td>女性健康 v1 + 点击对话</td><td>点击对话 + 卡片附着</td><td>女性活跃度</td></tr></tbody></table></div>
+<p>Alpha 内测：第 8 周，200 人。 MVP 通过条件：简报 > 65%、橡皮糖 > 40%、补剂添加 > 40%、D7 > 25%。</p>
+<h3>7.3 Phase 2：增强（第 13-24 周）</h3>
+<p>目标：完善模块矩阵，D7 > 30%</p>
+<div class="table-wrap"><table><thead><tr><th>迭代</th><th>核心交付</th><th>橡皮糖功能</th></tr></thead><tbody><tr><td>v2.0</td><td>压力管理 + 长按语音</td><td>担心/思考/说话状态 + 长按收音</td></tr><tr><td>v2.1</td><td>男性健康 v1 + 运动记录扩展 20+ 类型 + 运动疲劳算法</td><td>全 9 种状态切换</td></tr><tr><td>v2.2</td><td>恢复评分 + 训练建议 + GPS 完善 + 周报</td><td>开心/摸头状态</td></tr><tr><td>v2.3</td><td>体温管理 + 围绝经期/潮热模式</td><td>体温相关表情</td></tr><tr><td>v2.4</td><td>Agent 优化（语气/推送/天气融合）</td><td>可拖拽 + 位置记忆</td></tr><tr><td>v2.5</td><td>月报 + 趋势 + 补剂交互提醒</td><td>睡觉状态</td></tr></tbody></table></div>
+<p>Beta 公测：第 14 周。</p>
+<h3>7.4 Phase 3：扩展（第 25 周+）</h3>
+<div class="table-wrap"><table><thead><tr><th>迭代</th><th>核心交付</th></tr></thead><tbody><tr><td>v3.0</td><td>智能耳夹硬件 + App 联动</td></tr><tr><td>v3.1</td><td>华为/小米 SDK 接入 + 专业版订阅</td></tr><tr><td>v3.2</td><td>运动记录 50+ 类型 + 训练计划 Agent</td></tr><tr><td>v3.3</td><td>用药管理模块</td></tr></tbody></table></div>
+<h3>7.5 可用资源</h3>
+<p>Phase 1：PMx1 + iOSx1 + Androidx1 + 后端x1 + 算法x1 + 设计师x1（兼） Phase 2 起各角色增至 1-2 人</p>
+<hr>
+<h2>8. 上线策略</h2>
+<h3>8.1 核心策略</h3>
+<p>功能钩子 + 社区裂变 + 垂直场景打透。首要获客钩子：体检报告 AI 解析。</p>
+<h3>8.2 第一阶段：种子用户冷启动（第 8-14 周）</h3>
+<p>招募 500-1000 人。渠道：小红书健康博主（40%）、即刻 Wearable 圈子（25%）、虎扑运动区（15%）、私域（10%）、豆瓣（10%）。</p>
+<p>钩子：主钩子为体检报告 AI 解读，副钩子为限量邀请码+专属皮肤，留存钩子为种子用户永久折扣。</p>
+<p>种子用户目标：简报 > 65%、橡皮糖点击率 > 50%、D7 > 30%、NPS > 40。</p>
+<h3>8.3 第二阶段：垂直场景打透（第 16-22 周）</h3>
+<p>首选打透场景：女性经期管理 + 备孕。与 15-20 位 KOC/KOL 合作，场景包装为"AI 备孕助手"。</p>
+<p>备选场景：男性睡眠呼吸筛查。</p>
+<h3>8.4 第三阶段：泛人群扩展（第 24 周+）</h3>
+<p>免费体检报告解读工具引流、体检中心合作（美年/爱康）、穿戴设备联名、老带新。</p>
+<h3>8.5 定价</h3>
+<div class="table-wrap"><table><thead><tr><th>层级</th><th>价格</th><th>功能</th></tr></thead><tbody><tr><td>免费版</td><td>免费</td><td>基本档案 + 简报 + 3 项指标 + 基础补剂 + 橡皮糖基础</td></tr><tr><td>专业版</td><td>19 元/月 或 168 元/年</td><td>全部模块 + 报告解析 + 高级 Agent + 全状态橡皮糖</td></tr><tr><td>硬件套包</td><td>499 元（耳夹+3 月专业版）</td><td>全部功能 + 耳夹</td></tr></tbody></table></div>
+<hr>
+<h2>9. 不在此版本范围内</h2>
+<div class="table-wrap"><table><thead><tr><th>范围</th><th>原因</th></tr></thead><tbody><tr><td>饮食拍照 AI 识别</td><td>技术复杂度高</td></tr><tr><td>社交/社区/排行榜</td><td>MVP 优先单用户</td></tr><tr><td>多语言/国际化</td><td>首发中文</td></tr><tr><td>心理咨询/AI 对话</td><td>合规风险高</td></tr><tr><td>双耳耳夹</td><td>硬件 v2</td></tr></tbody></table></div>
+<hr>
+<h2>10. 依赖与风险</h2>
+<div class="table-wrap"><table><thead><tr><th>依赖</th><th>用途</th><th>优先级</th><th>替代</th></tr></thead><tbody><tr><td>Apple HealthKit / Google Fit API</td><td>数据源</td><td>P0</td><td>无</td></tr><tr><td>OCR + 结构化提取</td><td>体检报告</td><td>P0</td><td>人工修正</td></tr><tr><td>规则推理引擎</td><td>Agent L1</td><td>P0</td><td>服务端自建</td></tr><tr><td>天气 API</td><td>天气融合</td><td>P0</td><td>可切换服务商</td></tr><tr><td>Lottie 动画</td><td>橡皮糖</td><td>P0</td><td>系统动画备选</td></tr><tr><td>Speech API / TTS</td><td>语音</td><td>P1</td><td>第三方 SDK</td></tr><tr><td>华为/小米 SDK</td><td>国内设备</td><td>P1（Phase 2）</td><td>-</td></tr><tr><td>BLE SDK</td><td>耳夹硬件</td><td>P1（Phase 3）</td><td>芯片厂商提供</td></tr></tbody></table></div>
+<div class="table-wrap"><table><thead><tr><th>风险</th><th>概率</th><th>缓解</th></tr></thead><tbody><tr><td>用户不愿持续佩戴设备</td><td>中</td><td>App 不绑定硬件</td></tr><tr><td>体检报告解析准确度不足</td><td>中</td><td>限 6-10 项 + 用户修正</td></tr><tr><td>Agent 建议不够个性化</td><td>高</td><td>首版规则引擎 + 逐步引入模型</td></tr><tr><td>数据隐私顾虑</td><td>中</td><td>本地优先处理</td></tr><tr><td>橡皮糖交互接受度低</td><td>中</td><td>MVP 测试 + 设置回退选项</td></tr></tbody></table></div>
+<hr>
+<div class="pills"><span class="pill">文档版本：v5.0</span><span class="pill status">状态：已审核通过</span><span class="pill">最后更新：2026-07-12</span></div></div></section><section class="panel" id="doc2"><div class="container"><div class="hero">
+<h1>智能耳夹硬件 --- 产品需求文档（PRD）</h1>
+<div class="pills"><span class="pill">版本：v1.1</span><span class="pill">2026-07-11</span><span class="pill status">状态：已审核通过</span><span class="pill">产品：智能耳夹一代</span><span class="pill">形态：简约 U 型耳夹</span></div>
+</div>
+<hr>
+<h2>1. 为什么选择耳夹形态</h2>
+<h3>1.1 耳部的生理信号优势</h3>
+<p>智能穿戴设备的传感器位置直接影响信号质量。耳部在多个关键生命体征的采集上具有不可替代的优势：</p>
+<p><strong>PPG 信号质量优于手腕</strong></p>
+<p>光电容积描记法（PPG）是心率、HRV、血氧的核心传感技术。耳垂的组织厚度较薄（3-5mm），毛细血管密度高，血流灌注稳定，且耳部相对心脏的位置固定。相比之下，手腕会随手臂摆动高于或低于心脏水平，导致静脉回流变化和运动伪影，显著降低 PPG 信号的信噪比。</p>
+<p>已有研究表明，耳部 PPG 在运动状态下的信号可用率比手腕 PPG 高 30-50%（参考：Tamura et al., Progress in Biomedical Engineering, 2019）。</p>
+<p><strong>体温接近核心温度</strong></p>
+<p>鼓膜温度是临床公认的核心体温替代测量点。耳夹虽然在耳垂而非耳道内，但其位置仍比手腕远端更接近核心体温源。腕部皮肤温度受外周血管收缩和环境温度的影响极大——低温环境下手腕温度可偏离核心体温 3-5C，而耳部偏离通常小于 1C。</p>
+<p><strong>声学通道优势</strong></p>
+<p>耳部是唯一可以自然拾取体内声学信号的位置。心音（S1/S2）、呼吸音、鼾声等声学生理信号在耳道范围内清晰可采集，而这些信号手腕设备完全无法获取。</p>
+<p><strong>头部运动的独特性</strong></p>
+<p>睡眠阶段识别依赖加速度计数据。手臂在睡眠中会有大量非移动性抖动（翻身时的惯性摆动），而头部运动更直接地反映真实的身体姿势变化和起床动作，使夜起检测和睡眠分期的准确率更高。</p>
+<h3>1.2 耳夹 vs 其他形态的综合对比</h3>
+<div class="table-wrap"><table><thead><tr><th>对比维度</th><th>耳夹</th><th>手腕（手表/手环）</th><th>戒指</th><th>入耳式</th></tr></thead><tbody><tr><td>PPG 信号稳定性</td><td>优（位置固定+灌注好）</td><td>中（运动伪影多）</td><td>良（手指远端灌注差）</td><td>优</td></tr><tr><td>体温精度</td><td>良-优（近核心温）</td><td>中（外周温差大）</td><td>中</td><td>优（耳道内）</td></tr><tr><td>声学信号（心音/鼾声）</td><td>可采集</td><td>不可采集</td><td>不可采集</td><td>优</td></tr><tr><td>睡眠跟踪精度</td><td>优（头部稳定）</td><td>中（手臂假动干扰）</td><td>良</td><td>优</td></tr><tr><td>佩戴舒适度（全天）</td><td>优（3g，无感）</td><td>中（30g+，需表带）</td><td>良（异物感因人而异）</td><td>差（耳道胀感）</td></tr><tr><td>运动兼容性</td><td>优（不妨碍活动）</td><td>良（部分运动受影响）</td><td>优</td><td>中</td></tr><tr><td>续航潜力</td><td>5-7 天</td><td>1-2 天（手表）</td><td>4-7 天</td><td>8-10h（入耳）</td></tr></tbody></table></div>
+<hr>
+<h2>2. 市面竞品横向对比</h2>
+<h3>2.1 功能矩阵</h3>
+<div class="table-wrap"><table><thead><tr><th>功能</th><th>本产品（耳夹一代）</th><th>Apple Watch S10</th><th>Oura Ring Gen4</th><th>Whoop 5.0</th><th>小米手环 9</th><th>Bose Sleepbuds II</th></tr></thead><tbody><tr><td>佩戴位置</td><td>耳垂（夹式）</td><td>手腕</td><td>手指</td><td>手腕</td><td>手腕</td><td>耳道内</td></tr><tr><td>重量</td><td>< 3g</td><td>约 42g</td><td>约 5g</td><td>约 27g</td><td>约 15g</td><td>约 2g/只</td></tr><tr><td>心率</td><td>连续 PPG</td><td>连续 PPG</td><td>连续 PPG</td><td>连续 PPG</td><td>连续 PPG</td><td>无</td></tr><tr><td>HRV</td><td>连续</td><td>非连续</td><td>连续</td><td>连续</td><td>非连续</td><td>无</td></tr><tr><td>血氧 SpO2</td><td>连续</td><td>按需</td><td>夜间</td><td>无</td><td>按需</td><td>无</td></tr><tr><td>皮肤温度</td><td>连续高精度</td><td>夜间（手腕）</td><td>连续（手指）</td><td>无</td><td>无</td><td>无</td></tr><tr><td>睡眠阶段</td><td>自动识别</td><td>自动识别</td><td>自动识别</td><td>自动识别</td><td>自动识别</td><td>仅限入睡</td></tr><tr><td>鼾声检测</td><td>原生支持</td><td>无</td><td>无</td><td>无</td><td>无</td><td>有（遮蔽鼾声）</td></tr><tr><td>心音/呼吸音</td><td>可采集</td><td>无</td><td>无</td><td>无</td><td>无</td><td>无</td></tr><tr><td>运动GPS</td><td>无（依赖手机）</td><td>内置 GPS</td><td>无</td><td>无（依赖手机）</td><td>连接手机</td><td>无</td></tr><tr><td>防水</td><td>IPX5</td><td>WR50（50m）</td><td>100m</td><td>10m</td><td>5ATM</td><td>无</td></tr><tr><td>续航</td><td>5-7 天</td><td>18-36h（全天候）</td><td>4-7 天</td><td>4-5 天</td><td>14-21 天</td><td>10h/次</td></tr><tr><td>充电方式</td><td>磁吸充电仓</td><td>MagSafe/磁吸</td><td>充电座</td><td>充电座/USB</td><td>磁吸</td><td>充电仓</td></tr><tr><td>App 生态</td><td>自研（含 AI Agent）</td><td>苹果健康</td><td>Oura App</td><td>Whoop App</td><td>小米运动</td><td>Bose Sleep</td></tr><tr><td>参考价格</td><td>（待定）</td><td>约 2999 元起</td><td>约 2499 元起</td><td>约 1800 元/年订阅</td><td>约 249 元</td><td>约 1699 元</td></tr><tr><td>AI 主动建议</td><td>有（Agent）</td><td>无</td><td>无</td><td>少量</td><td>无</td><td>无</td></tr></tbody></table></div>
+<h3>2.2 核心差异总结</h3>
+<div class="table-wrap"><table><thead><tr><th>维度</th><th>本产品相比竞品的优势</th><th>本产品的劣势</th></tr></thead><tbody><tr><td><strong>传感能力</strong></td><td>唯一可同时采集 PPG+体温+声学的非入耳形态。鼾声检测和心音采集是腕戴和指戴产品完全做不到的。</td><td>无 ECG（手表有）、无 GPS（依赖手机）</td></tr><tr><td><strong>佩戴体验</strong></td><td>3g 的无感佩戴远超手表（42g）和手环，不入耳的设计优于 Bose 类入耳产品，无耳道压迫</td><td>形态新颖，用户需要适应期</td></tr><tr><td><strong>健康管理深度</strong></td><td>AI Agent 推理层+体检报告解析+补剂管理，竞品无此组合</td><td>App 生态初期不如苹果健康成熟</td></tr><tr><td><strong>定价空间</strong></td><td>耳夹无屏幕和 GPS，BOM 成本低于手表，有机会定在千元以内</td><td>需要同时推广硬件和 App，获客成本较高</td></tr></tbody></table></div>
+<h3>2.3 竞品启示</h3>
+<p>1. <strong>不做手表替代品。</strong> 耳夹不试图提供 GPS、ECG、蜂窝网络等手表核心功能，而是聚焦健康传感精度和佩戴舒适度。 2. <strong>声学传感是护城河。</strong> 鼾声检测、心音分析、呼吸音监测是腕戴和指戴产品无法复制的传感维度，应作为核心卖点。 3. <strong>舒适度决定佩戴率。</strong> 重量越轻、佩戴越无感的设备，用户佩戴率越高，数据连续性越好。耳夹的 < 3g 是相比手表手环的核心优势。</p>
+<hr>
+<h2>3. 工业设计</h2>
+<h3>形态</h3>
+<p>U 型夹式结构，通过弹性夹持力固定在耳垂处。不入耳、不覆盖耳道。</p>
+<h3>尺寸与重量</h3>
+<div class="table-wrap"><table><thead><tr><th>参数</th><th>目标</th></tr></thead><tbody><tr><td>主体尺寸</td><td>约 18mm x 12mm x 8mm</td></tr><tr><td>整机重量</td><td>< 3g</td></tr><tr><td>夹持厚度范围</td><td>3-8mm（适配不同耳垂厚度）</td></tr></tbody></table></div>
+<h3>材质</h3>
+<div class="table-wrap"><table><thead><tr><th>部件</th><th>材质</th><th>说明</th></tr></thead><tbody><tr><td>外壳</td><td>医用级 PC/ABS</td><td>哑光表面，防指纹</td></tr><tr><td>耳夹接触面</td><td>医用级硅胶</td><td>柔软防滑，不过敏</td></tr><tr><td>传感器窗口</td><td>透明 PC 或蓝宝石玻璃</td><td>透光率 > 90%，耐磨</td></tr></tbody></table></div>
+<h3>颜色</h3>
+<p>首批提供两种配色：珍珠白、深空灰。</p>
+<hr>
+<h2>4. 传感器方案</h2>
+<div class="table-wrap"><table><thead><tr><th>传感器</th><th>规格方向</th><th>用途</th></tr></thead><tbody><tr><td>PPG 光学心率传感器</td><td>绿光+红光+红外三波长</td><td>心率、HRV、SpO2、呼吸率</td></tr><tr><td>NTC 热敏电阻</td><td>高精度（+-0.05C）</td><td>连续皮肤温度监测</td></tr><tr><td>6 轴 IMU</td><td>加速度计+陀螺仪</td><td>睡眠阶段、头部姿态、夜起检测</td></tr></tbody></table></div>
+<h3>传感器布局</h3>
+<p>PPG 发射端和接收端分置 U 型夹的两侧内侧，佩戴时夹住耳垂，光线穿透组织采集信号。</p>
+<p>NTC 热敏电阻置于接触耳垂皮肤一侧的硅胶垫内，确保皮肤接触稳定。</p>
+<hr>
+<h2>5. 电气规格</h2>
+<div class="table-wrap"><table><thead><tr><th>参数</th><th>规格</th></tr></thead><tbody><tr><td>蓝牙版本</td><td>BLE 5.2</td></tr><tr><td>芯片平台</td><td>Nordic nRF52 系列或同级</td></tr><tr><td>电池容量</td><td>> 25mAh（锂聚合物）</td></tr><tr><td>续航时间</td><td>5-7 天（连续佩戴）</td></tr><tr><td>充电接口</td><td>磁吸触点充电（充电仓内）</td></tr><tr><td>充电时间</td><td>< 1.5 小时（0-100%）</td></tr><tr><td>防水等级</td><td>IPX5（运动防汗、生活防水）</td></tr></tbody></table></div>
+<hr>
+<h2>6. 充电仓</h2>
+<div class="table-wrap"><table><thead><tr><th>参数</th><th>规格</th></tr></thead><tbody><tr><td>电池容量</td><td>> 300mAh</td></tr><tr><td>可充满耳夹次数</td><td>> 8 次</td></tr><tr><td>充电仓充电接口</td><td>USB-C</td></tr><tr><td>充电仓充满时间</td><td>< 2 小时</td></tr><tr><td>尺寸</td><td>约 50mm x 40mm x 25mm</td></tr><tr><td>指示灯</td><td>单 LED：充电中橙色 / 充满绿色 / 低电量红色闪烁</td></tr></tbody></table></div>
+<hr>
+<h2>7. 连接与配对</h2>
+<div class="table-wrap"><table><thead><tr><th>功能</th><th>说明</th></tr></thead><tbody><tr><td>配对方式</td><td>开盖即配对（霍尔开关检测开盖）</td></tr><tr><td>多设备支持</td><td>单设备连接</td></tr><tr><td>连接距离</td><td>> 10m（开放空间）</td></tr><tr><td>断连重连</td><td>自动重连</td></tr><tr><td>固件升级</td><td>通过 App OTA 升级</td></tr></tbody></table></div>
+<hr>
+<h2>8. 其他规格</h2>
+<div class="table-wrap"><table><thead><tr><th>项目</th><th>说明</th></tr></thead><tbody><tr><td>佩戴检测</td><td>电容式或光学检测，摘下后自动进入低功耗模式</td></tr><tr><td>工作温度</td><td>0C - 45C</td></tr><tr><td>存储温度</td><td>-20C - 60C</td></tr><tr><td>认证要求</td><td>CE / FCC / RoHS / ISO 10993 生物相容性</td></tr></tbody></table></div>
+<h3>指示灯定义</h3>
+<div class="table-wrap"><table><thead><tr><th>状态</th><th>LED 行为</th></tr></thead><tbody><tr><td>配对模式</td><td>蓝色慢闪</td></tr><tr><td>已连接</td><td>关闭（无灯）</td></tr><tr><td>低电量</td><td>红色快闪</td></tr><tr><td>充电中</td><td>橙色常亮</td></tr><tr><td>充满</td><td>绿色常亮</td></tr><tr><td>固件升级</td><td>蓝色快闪</td></tr></tbody></table></div>
+<h3>包装清单</h3>
+<div class="table-wrap"><table><thead><tr><th>内容</th><th>数量</th></tr></thead><tbody><tr><td>智能耳夹（单耳）</td><td>1</td></tr><tr><td>充电仓</td><td>1</td></tr><tr><td>USB-C 充电线</td><td>1</td></tr><tr><td>硅胶替换垫（不同厚度）</td><td>2 对</td></tr><tr><td>快速入门指南</td><td>1</td></tr></tbody></table></div>
+<hr>
+<h2>9. 与 App 的数据交互</h2>
+<p>耳夹采集的数据通过 BLE 传输到 App。App 端负责数据分析、模型推理和建议生成，耳夹仅做数据采集和预处理。</p>
+<div class="table-wrap"><table><thead><tr><th>数据项</th><th>传输频率</th></tr></thead><tbody><tr><td>心率/HRV</td><td>实时（每 5s 一个数据点）</td></tr><tr><td>血氧 SpO2</td><td>连续监测（夜间每 30s）</td></tr><tr><td>皮肤温度</td><td>连续监测（每 60s，事件触发时每 5s）</td></tr><tr><td>加速度数据</td><td>仅传输事件摘要（睡眠阶段、步数）</td></tr></tbody></table></div>
+<hr>
+<h2>10. 不在此版本范围内</h2>
+<div class="table-wrap"><table><thead><tr><th>范围</th><th>原因</th></tr></thead><tbody><tr><td>双耳立体声</td><td>一代为单耳设计</td></tr><tr><td>麦克风（通话/录音）</td><td>一代聚焦健康传感，后续版本</td></tr><tr><td>ECG 心电</td><td>需要双电极接触，U 型夹形态限制</td></tr><tr><td>皮肤电导 EDA</td><td>需要耳后电极触点</td></tr><tr><td>入耳式设计</td><td>一代为夹式，不入耳</td></tr></tbody></table></div>
+<hr>
+<div class="pills"><span class="pill">文档版本：v1.1</span><span class="pill status">状态：已审核通过</span><span class="pill">最后更新：2026-07-11</span></div></div></section>
+</main>
+<script>
+const tabs=document.querySelectorAll('.tab');
+const panels=document.querySelectorAll('.panel');
+tabs.forEach(t=>t.addEventListener('click',()=>{
+  const id=t.dataset.target;
+  tabs.forEach(x=>x.classList.toggle('active',x===t));
+  panels.forEach(p=>p.classList.toggle('active',p.id===id));
+  window.scrollTo({top:0,behavior:'smooth'});
+}));
+</script>
+</body>
+</html>
